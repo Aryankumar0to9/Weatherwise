@@ -3300,7 +3300,7 @@ function App() {
 
     try {
       const response = await fetch(
-        `http://127.0.0.1:8000/api/alerts?latitude=${coordinates.latitude}&longitude=${coordinates.longitude}`
+        `${API_BASE}/api/alerts?latitude=${coordinates.latitude}&longitude=${coordinates.longitude}`
       );
 
       if (!response.ok) {
@@ -3480,7 +3480,7 @@ const saveProfile = (profileId) => {
         try {
           // STEP 1: Weather is required.
           const weatherResponse = await fetch(
-            `http://127.0.0.1:8000/api/weather?latitude=${latitude}&longitude=${longitude}`
+            `${API_BASE}/api/weather?latitude=${latitude}&longitude=${longitude}`
           );
 
           if (!weatherResponse.ok) {
@@ -3498,7 +3498,7 @@ const saveProfile = (profileId) => {
 
           // STEP 2: Location name is required for a useful UI.
           const locationResponse = await fetch(
-            `http://127.0.0.1:8000/api/location?latitude=${latitude}&longitude=${longitude}`
+            `${API_BASE}/api/location?latitude=${latitude}&longitude=${longitude}`
           );
 
           if (!locationResponse.ok) {
@@ -3520,7 +3520,7 @@ const saveProfile = (profileId) => {
           // If this endpoint fails, weather and location still load.
           try {
             const airQualityResponse = await fetch(
-              `http://127.0.0.1:8000/api/air-quality?latitude=${latitude}&longitude=${longitude}`
+              `${API_BASE}/api/air-quality?latitude=${latitude}&longitude=${longitude}`
             );
 
             if (!airQualityResponse.ok) {
@@ -3683,7 +3683,7 @@ const saveProfile = (profileId) => {
 
     try {
       const geoResponse = await fetch(
-        `http://127.0.0.1:8000/api/geocode?city=${encodeURIComponent(travel.destination)}`
+        `${API_BASE}/api/geocode?city=${encodeURIComponent(travel.destination)}`
       );
 
       if (!geoResponse.ok) {
@@ -3698,7 +3698,7 @@ const saveProfile = (profileId) => {
       const geo = await geoResponse.json();
 
       const response = await fetch(
-        `http://127.0.0.1:8000/api/travel-analysis?latitude=${geo.latitude}&longitude=${geo.longitude}&date=${encodeURIComponent(travel.date)}&days=${encodeURIComponent(travel.days)}&trip_type=${encodeURIComponent(travel.tripType)}`
+        `${API_BASE}/api/travel-analysis?latitude=${geo.latitude}&longitude=${geo.longitude}&date=${encodeURIComponent(travel.date)}&days=${encodeURIComponent(travel.days)}&trip_type=${encodeURIComponent(travel.tripType)}`
       );
 
       if (!response.ok) {
@@ -3737,7 +3737,7 @@ const saveProfile = (profileId) => {
 
     try {
       const response = await fetch(
-        `http://127.0.0.1:8000/api/event-analysis?latitude=${coordinates.latitude}&longitude=${coordinates.longitude}&date=${encodeURIComponent(event.date)}&time=${encodeURIComponent(event.time)}&duration=${encodeURIComponent(event.duration)}`
+        `${API_BASE}/api/event-analysis?latitude=${coordinates.latitude}&longitude=${coordinates.longitude}&date=${encodeURIComponent(event.date)}&time=${encodeURIComponent(event.time)}&duration=${encodeURIComponent(event.duration)}`
       );
 
       if (!response.ok) throw new Error("Event analysis unavailable");
