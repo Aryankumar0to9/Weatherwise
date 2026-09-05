@@ -539,24 +539,45 @@ def build_weather_alerts(weather_data, air_quality_data=None):
 
 @app.get("/api/alerts")
 def get_alerts(latitude: float, longitude: float):
+    # Use the same standard forecast request as /api/weather so Alerts
+    # can reuse the backend cache instead of consuming another provider call.
     weather_url = "https://api.open-meteo.com/v1/forecast"
     weather_params = {
         "latitude": latitude,
         "longitude": longitude,
         "current": ",".join([
             "temperature_2m",
+            "relative_humidity_2m",
+            "apparent_temperature",
+            "precipitation",
+            "rain",
+            "weather_code",
             "wind_speed_10m",
+            "wind_direction_10m",
             "wind_gusts_10m",
             "uv_index",
         ]),
         "hourly": ",".join([
+            "temperature_2m",
+            "apparent_temperature",
+            "relative_humidity_2m",
             "precipitation_probability",
             "weather_code",
             "wind_speed_10m",
+            "uv_index",
         ]),
-        "daily": "weather_code,precipitation_probability_max",
+        "daily": ",".join([
+            "temperature_2m_max",
+            "temperature_2m_min",
+            "precipitation_probability_max",
+            "weather_code",
+            "sunrise",
+            "sunset",
+            "wind_speed_10m_max",
+            "uv_index_max",
+        ]),
         "timezone": "auto",
-        "forecast_days": 2,
+        "forecast_days": 7,
     }
 
     try:
@@ -666,22 +687,47 @@ def analyze_event(
     duration: int = 3,
     setting: str = "Outdoor",
 ):
-    # Reuse Open-Meteo forecast data. The endpoint requests hourly data for the
-    # event date so the recommendation is based on actual forecast variables.
+    # Reuse the same standard 7-day forecast request used by /api/weather.
+    # This is important in production: if the homepage has already loaded
+    # weather for these coordinates, this request is served from the backend
+    # cache instead of making another Open-Meteo request.
     weather_url = "https://api.open-meteo.com/v1/forecast"
     params = {
         "latitude": latitude,
         "longitude": longitude,
+        "current": ",".join([
+            "temperature_2m",
+            "relative_humidity_2m",
+            "apparent_temperature",
+            "precipitation",
+            "rain",
+            "weather_code",
+            "wind_speed_10m",
+            "wind_direction_10m",
+            "wind_gusts_10m",
+            "uv_index",
+        ]),
         "hourly": ",".join([
             "temperature_2m",
+            "apparent_temperature",
+            "relative_humidity_2m",
             "precipitation_probability",
+            "weather_code",
             "wind_speed_10m",
             "uv_index",
+        ]),
+        "daily": ",".join([
+            "temperature_2m_max",
+            "temperature_2m_min",
+            "precipitation_probability_max",
             "weather_code",
+            "sunrise",
+            "sunset",
+            "wind_speed_10m_max",
+            "uv_index_max",
         ]),
         "timezone": "auto",
-        "start_date": date,
-        "end_date": date,
+        "forecast_days": 7,
     }
 
     try:
