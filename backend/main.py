@@ -3,6 +3,9 @@ from fastapi.middleware.cors import CORSMiddleware
 import requests
 import time
 from threading import Lock
+from datetime import datetime, timedelta
+from timezonefinder import TimezoneFinder
+from zoneinfo import ZoneInfo
 
 app = FastAPI(title="WeatherWise API")
 
@@ -134,6 +137,306 @@ def external_api_error(service, exc):
         status_code=502,
         detail=f"{service} request failed: {message}",
     )
+
+
+
+# ============================================================
+# FREE WEATHER FALLBACK — MET NORWAY
+# Open-Meteo remains the primary provider. If Render/Open-Meteo
+# returns 429 or another temporary provider error, WeatherWise
+# falls back to MET Norway's free global Locationforecast API.
+#
+# MET Norway requires a unique identifying User-Agent and recommends
+# caching responses and rounding coordinates for efficient caching.
+# ============================================================
+
+MET_URL = "https://api.met.no/weatherapi/locationforecast/2.0/compact"
+MET_HEADERS = {
+    "User-Agent": "WeatherWise/1.0 (https://weatherwise-green.vercel.app)",
+    "Accept": "application/json",
+}
+_timezone_finder = TimezoneFinder()
+
+# Basic MET symbol -> WMO weather-code mapping used by the existing
+# WeatherWise frontend. This is intentionally conservative.
+MET_SYMBOL_TO_WMO = {
+    "clearsky": 0,
+    "fair": 1,
+    "partlycloudy": 2,
+    "cloudy": 3,
+    "fog": 45,
+    "lightrain": 61,
+    "rain": 63,
+    "heavyrain": 65,
+    "lightsleet": 66,
+    "sleet": 66,
+    "heavysleet": 67,
+    "lightsnow": 71,
+    "snow": 73,
+    "heavysnow": 75,
+    "rainshowers": 80,
+    "heavyrainshowers": 82,
+    "sleetshowers": 81,
+    "heavysleetshowers": 82,
+    "snowshowers": 85,
+    "heavysnowshowers": 86,
+    "rainandthunder": 95,
+    "heavyrainandthunder": 95,
+    "lightrainandthunder": 95,
+    "sleetandthunder": 96,
+    "snowandthunder": 99,
+}
+
+
+def _met_symbol_to_wmo(symbol):
+    if not symbol:
+        return 3
+
+    base = str(symbol).lower().split("_")[0]
+    if base in MET_SYMBOL_TO_WMO:
+        return MET_SYMBOL_TO_WMO[base]
+
+    # Handle symbols containing the weather family even if MET adds
+    # day/night suffixes or variant names.
+    for key, code in MET_SYMBOL_TO_WMO.items():
+        if base.startswith(key):
+            return code
+
+    return 3
+
+
+def _met_timezone(latitude, longitude):
+    tz_name = _timezone_finder.timezone_at(
+        lat=float(latitude),
+        lng=float(longitude),
+    )
+    return tz_name or "UTC"
+
+
+def fetch_met_forecast(latitude, longitude):
+    # MET Norway explicitly recommends no more than four decimals so its
+    # cache can match nearby requests efficiently.
+    lat = round(float(latitude), 4)
+    lon = round(float(longitude), 4)
+
+    params = {
+        "lat": lat,
+        "lon": lon,
+    }
+
+    key = _cache_key(MET_URL, params)
+    now = time.monotonic()
+
+    with _cache_lock:
+        cached = _response_cache.get(key)
+        if cached and now - cached["time"] < CACHE_TTL_SECONDS:
+            return cached["data"]
+
+    response = requests.get(
+        MET_URL,
+        params=params,
+        headers=MET_HEADERS,
+        timeout=15,
+    )
+    response.raise_for_status()
+    raw = response.json()
+
+    normalized = normalize_met_forecast(raw, lat, lon)
+
+    with _cache_lock:
+        _response_cache[key] = {
+            "time": time.monotonic(),
+            "data": normalized,
+        }
+
+    return normalized
+
+
+def normalize_met_forecast(raw, latitude, longitude):
+    properties = raw.get("properties", {})
+    series = properties.get("timeseries", []) or []
+
+    tz_name = _met_timezone(latitude, longitude)
+    tz = ZoneInfo(tz_name)
+
+    hourly = {
+        "time": [],
+        "temperature_2m": [],
+        "apparent_temperature": [],
+        "relative_humidity_2m": [],
+        "precipitation_probability": [],
+        "weather_code": [],
+        "wind_speed_10m": [],
+        "uv_index": [],
+    }
+
+    daily_buckets = {}
+
+    for item in series:
+        timestamp = item.get("time")
+        if not timestamp:
+            continue
+
+        try:
+            utc_dt = datetime.fromisoformat(timestamp.replace("Z", "+00:00"))
+            local_dt = utc_dt.astimezone(tz)
+        except (ValueError, TypeError):
+            continue
+
+        data = item.get("data", {})
+        instant = data.get("instant", {}).get("details", {}) or {}
+
+        next_1 = data.get("next_1_hours", {}).get("details", {}) or {}
+        next_6 = data.get("next_6_hours", {}).get("details", {}) or {}
+        next_12 = data.get("next_12_hours", {}).get("details", {}) or {}
+
+        temperature = instant.get("air_temperature")
+        humidity = instant.get("relative_humidity")
+        wind_ms = instant.get("wind_speed")
+        wind_dir = instant.get("wind_from_direction")
+        gust_ms = instant.get("wind_speed_of_gust")
+        uv = instant.get("ultraviolet_index_clear_sky")
+
+        rain_probability = (
+            next_1.get("probability_of_precipitation")
+            if next_1.get("probability_of_precipitation") is not None
+            else next_6.get("probability_of_precipitation")
+            if next_6.get("probability_of_precipitation") is not None
+            else next_12.get("probability_of_precipitation")
+        )
+
+        precipitation = (
+            next_1.get("precipitation_amount")
+            if next_1.get("precipitation_amount") is not None
+            else next_6.get("precipitation_amount")
+            if next_6.get("precipitation_amount") is not None
+            else 0
+        )
+
+        symbol = (
+            data.get("next_1_hours", {}).get("summary", {}).get("symbol_code")
+            or data.get("next_6_hours", {}).get("summary", {}).get("symbol_code")
+            or data.get("next_12_hours", {}).get("summary", {}).get("symbol_code")
+        )
+        weather_code = _met_symbol_to_wmo(symbol)
+
+        wind_kmh = round(float(wind_ms) * 3.6, 1) if wind_ms is not None else None
+        gust_kmh = round(float(gust_ms) * 3.6, 1) if gust_ms is not None else None
+
+        local_time = local_dt.replace(tzinfo=None).isoformat(timespec="minutes")
+
+        hourly["time"].append(local_time)
+        hourly["temperature_2m"].append(temperature)
+        hourly["apparent_temperature"].append(temperature)
+        hourly["relative_humidity_2m"].append(humidity)
+        hourly["precipitation_probability"].append(
+            round(float(rain_probability), 1) if rain_probability is not None else 0
+        )
+        hourly["weather_code"].append(weather_code)
+        hourly["wind_speed_10m"].append(wind_kmh)
+        hourly["uv_index"].append(uv)
+
+        day = local_dt.date().isoformat()
+        bucket = daily_buckets.setdefault(day, {
+            "temps": [],
+            "rain": [],
+            "wind": [],
+            "uv": [],
+            "codes": [],
+        })
+
+        if temperature is not None:
+            bucket["temps"].append(float(temperature))
+        if rain_probability is not None:
+            bucket["rain"].append(float(rain_probability))
+        if wind_kmh is not None:
+            bucket["wind"].append(float(wind_kmh))
+        if uv is not None:
+            bucket["uv"].append(float(uv))
+        bucket["codes"].append(weather_code)
+
+    dates = sorted(daily_buckets.keys())[:9]
+
+    daily = {
+        "time": dates,
+        "temperature_2m_max": [],
+        "temperature_2m_min": [],
+        "precipitation_probability_max": [],
+        "weather_code": [],
+        "sunrise": [None for _ in dates],
+        "sunset": [None for _ in dates],
+        "wind_speed_10m_max": [],
+        "uv_index_max": [],
+    }
+
+    for day in dates:
+        bucket = daily_buckets[day]
+        daily["temperature_2m_max"].append(
+            round(max(bucket["temps"]), 1) if bucket["temps"] else None
+        )
+        daily["temperature_2m_min"].append(
+            round(min(bucket["temps"]), 1) if bucket["temps"] else None
+        )
+        daily["precipitation_probability_max"].append(
+            round(max(bucket["rain"]), 1) if bucket["rain"] else 0
+        )
+        daily["weather_code"].append(
+            bucket["codes"][0] if bucket["codes"] else 3
+        )
+        daily["wind_speed_10m_max"].append(
+            round(max(bucket["wind"]), 1) if bucket["wind"] else 0
+        )
+        daily["uv_index_max"].append(
+            round(max(bucket["uv"]), 1) if bucket["uv"] else 0
+        )
+
+    current = {
+        "temperature_2m": hourly["temperature_2m"][0] if hourly["temperature_2m"] else None,
+        "relative_humidity_2m": hourly["relative_humidity_2m"][0] if hourly["relative_humidity_2m"] else None,
+        "apparent_temperature": hourly["apparent_temperature"][0] if hourly["apparent_temperature"] else None,
+        "precipitation": 0,
+        "rain": 0,
+        "weather_code": hourly["weather_code"][0] if hourly["weather_code"] else 3,
+        "wind_speed_10m": hourly["wind_speed_10m"][0] if hourly["wind_speed_10m"] else 0,
+        "wind_direction_10m": None,
+        "wind_gusts_10m": None,
+        "uv_index": hourly["uv_index"][0] if hourly["uv_index"] else 0,
+    }
+
+    return {
+        "latitude": float(latitude),
+        "longitude": float(longitude),
+        "timezone": tz_name,
+        "current": current,
+        "hourly": hourly,
+        "daily": daily,
+        "_provider": "MET Norway",
+    }
+
+
+def get_forecast(latitude, longitude, params):
+    """
+    Primary: Open-Meteo.
+    Fallback: MET Norway when Open-Meteo is temporarily unavailable or
+    rate-limited. Both are normalized to the Open-Meteo-shaped structure
+    expected by the existing WeatherWise endpoints.
+    """
+    try:
+        return fetch_json(
+            "https://api.open-meteo.com/v1/forecast",
+            params=params,
+            timeout=15,
+        )
+    except requests.RequestException as open_meteo_error:
+        try:
+            return fetch_met_forecast(latitude, longitude)
+        except requests.RequestException as met_error:
+            # Preserve the primary error because it is the most useful
+            # diagnosis if both providers fail.
+            raise requests.RequestException(
+                f"Open-Meteo failed ({open_meteo_error}); "
+                f"MET Norway fallback failed ({met_error})"
+            )
 
 
 def calculate_outdoor_intelligence(
@@ -274,10 +577,10 @@ def get_weather(latitude: float, longitude: float):
     }
 
     try:
-        data = fetch_json(
-            weather_url,
-            params=params,
-            timeout=15,
+        data = get_forecast(
+            latitude,
+            longitude,
+            params,
         )
     except requests.RequestException as exc:
         raise external_api_error("Weather API", exc)
@@ -311,6 +614,7 @@ def get_weather(latitude: float, longitude: float):
         "intelligence": {
             "outdoor": outdoor,
         },
+        "provider": data.get("_provider", "Open-Meteo"),
     }
 
 
@@ -574,17 +878,16 @@ def get_alerts(latitude: float, longitude: float):
             "sunrise",
             "sunset",
             "wind_speed_10m_max",
-            "uv_index_max",
         ]),
         "timezone": "auto",
         "forecast_days": 7,
     }
 
     try:
-        weather_data = fetch_json(
-            weather_url,
-            params=weather_params,
-            timeout=10,
+        weather_data = get_forecast(
+            latitude,
+            longitude,
+            weather_params,
         )
     except requests.RequestException as exc:
         raise external_api_error("Alerts weather API", exc)
@@ -615,7 +918,6 @@ def get_alerts(latitude: float, longitude: float):
 
 # ---------------- EVENT PLANNER ----------------
 
-from datetime import datetime, timedelta
 
 def calculate_event_suitability(
     temperature,
@@ -724,17 +1026,16 @@ def analyze_event(
             "sunrise",
             "sunset",
             "wind_speed_10m_max",
-            "uv_index_max",
         ]),
         "timezone": "auto",
         "forecast_days": 7,
     }
 
     try:
-        data = fetch_json(
-            weather_url,
-            params=params,
-            timeout=15,
+        data = get_forecast(
+            latitude,
+            longitude,
+            params,
         )
     except requests.RequestException as exc:
         raise external_api_error("Event forecast API", exc)
@@ -982,10 +1283,10 @@ def analyze_travel(
     }
 
     try:
-        data = fetch_json(
-            weather_url,
-            params=params,
-            timeout=15,
+        data = get_forecast(
+            latitude,
+            longitude,
+            params,
         )
     except requests.RequestException as exc:
         raise external_api_error("Travel forecast API", exc)
