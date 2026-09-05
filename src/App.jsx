@@ -97,7 +97,7 @@ function PlanningCard({ icon, title, text, onClick }) {
 
       <p>{text}</p>
 
-      <button type="button" onClick={onClick}>Explore →</button>
+      <button type="button" onClick={onClick}>Explore â†’</button>
     </div>
   );
 }
@@ -202,8 +202,8 @@ function HealthAirQuality({ airQuality, weather }) {
         </div>
 
         <div className="air-data-grid">
-          <div className="air-data-item"><span>PM2.5</span><strong>{current.pm2_5 != null ? `${current.pm2_5.toFixed(1)} µg/m³` : '--'}</strong></div>
-          <div className="air-data-item"><span>PM10</span><strong>{current.pm10 != null ? `${current.pm10.toFixed(1)} µg/m³` : '--'}</strong></div>
+          <div className="air-data-item"><span>PM2.5</span><strong>{current.pm2_5 != null ? `${current.pm2_5.toFixed(1)} Âµg/mÂ³` : '--'}</strong></div>
+          <div className="air-data-item"><span>PM10</span><strong>{current.pm10 != null ? `${current.pm10.toFixed(1)} Âµg/mÂ³` : '--'}</strong></div>
           <div className="air-data-item"><span>Humidity</span><strong>{weather?.relative_humidity_2m != null ? `${weather.relative_humidity_2m}%` : '--'}</strong></div>
           <div className="air-data-item"><span>UV Index</span><strong>{weather?.uv_index != null ? weather.uv_index : '--'}</strong></div>
         </div>
@@ -236,7 +236,7 @@ function ForecastCard({ daily }) {
   };
 
   // Reverse the forecast visually:
-  // 7th day → 6th day → ... → 2nd day → Today
+  // 7th day â†’ 6th day â†’ ... â†’ 2nd day â†’ Today
   const forecastDays = daily.time
     .map((date, index) => ({
       date,
@@ -274,11 +274,11 @@ function ForecastCard({ daily }) {
 
               <div className="forecast-temperature">
                 <strong>
-                  {Math.round(daily.temperature_2m_max[index])}°
+                  {Math.round(daily.temperature_2m_max[index])}Â°
                 </strong>
 
                 <span>
-                  {Math.round(daily.temperature_2m_min[index])}°
+                  {Math.round(daily.temperature_2m_min[index])}Â°
                 </span>
               </div>
 
@@ -401,7 +401,7 @@ function OutdoorPlanner({ hourly }) {
         <div className="outdoor-recommendation-data">
           <div>
             <Thermometer size={16} />
-            {Math.round(bestHour.temperature)}°
+            {Math.round(bestHour.temperature)}Â°
           </div>
 
           <div>
@@ -439,7 +439,7 @@ function OutdoorPlanner({ hourly }) {
               </div>
 
               <div className="hour-temperature">
-                {Math.round(item.temperature)}°
+                {Math.round(item.temperature)}Â°
               </div>
 
               <div className="hour-detail">
@@ -530,7 +530,7 @@ function PlanningInsights({ selectedPlan, backendResponse, airQuality, weather }
             <p>{travel.text}</p>
           </div>
           <div className="decision-grid">
-            <div><span>Temperature</span><strong>{current?.temperature_2m != null ? `${Math.round(current.temperature_2m)}°C` : "--"}</strong></div>
+            <div><span>Temperature</span><strong>{current?.temperature_2m != null ? `${Math.round(current.temperature_2m)}Â°C` : "--"}</strong></div>
             <div><span>Rain chance</span><strong>{backendResponse?.hourly?.precipitation_probability?.[0] != null ? `${backendResponse.hourly.precipitation_probability[0]}%` : "--"}</strong></div>
             <div><span>Wind</span><strong>{current?.wind_speed_10m != null ? `${Math.round(current.wind_speed_10m)} km/h` : "--"}</strong></div>
             <div><span>UV index</span><strong>{current?.uv_index != null ? current.uv_index : "--"}</strong></div>
@@ -586,8 +586,8 @@ function ProfileIntelligence({ profile, backendResponse, airQuality }) {
       title: "Weather for better field decisions.",
       metrics: [
         ["Rain chance", `${Math.round(rainMax)}%`],
-        ["Max temperature", tempMax != null ? `${Math.round(tempMax)}°C` : "--"],
-        ["Min temperature", tempMin !== 99 ? `${Math.round(tempMin)}°C` : "--"],
+        ["Max temperature", tempMax != null ? `${Math.round(tempMax)}Â°C` : "--"],
+        ["Min temperature", tempMin !== 99 ? `${Math.round(tempMin)}Â°C` : "--"],
         ["Humidity", humidityAvg != null ? `${humidityAvg}%` : "--"],
       ],
       insight:
@@ -606,7 +606,7 @@ function ProfileIntelligence({ profile, backendResponse, airQuality }) {
       eyebrow: "SMART COMMUTE",
       title: "Weather-aware travel guidance.",
       metrics: [
-        ["Temperature", firstTemp != null ? `${Math.round(firstTemp)}°C` : "--"],
+        ["Temperature", firstTemp != null ? `${Math.round(firstTemp)}Â°C` : "--"],
         ["Rain chance", `${Math.round(firstRain)}%`],
         ["Wind", wind != null ? `${Math.round(wind)} km/h` : "--"],
         ["Visibility risk", firstRain >= 70 || wind >= 35 ? "Higher" : "Low"],
@@ -630,7 +630,7 @@ function ProfileIntelligence({ profile, backendResponse, airQuality }) {
         ["Rain chance", `${Math.round(firstRain)}%`],
         ["AQI", aqi != null ? `${Math.round(aqi)} US AQI` : "--"],
         ["UV index", uv != null ? Math.round(uv) : "--"],
-        ["Temperature", firstTemp != null ? `${Math.round(firstTemp)}°C` : "--"],
+        ["Temperature", firstTemp != null ? `${Math.round(firstTemp)}Â°C` : "--"],
       ],
       insight:
         aqi != null && aqi > 100
@@ -652,7 +652,7 @@ function ProfileIntelligence({ profile, backendResponse, airQuality }) {
       metrics: [
         ["Rain chance", `${Math.round(firstRain)}%`],
         ["Humidity", humidity != null ? `${Math.round(humidity)}%` : "--"],
-        ["Temperature", firstTemp != null ? `${Math.round(firstTemp)}°C` : "--"],
+        ["Temperature", firstTemp != null ? `${Math.round(firstTemp)}Â°C` : "--"],
         ["UV index", uv != null ? Math.round(uv) : "--"],
       ],
       insight:
@@ -702,7 +702,7 @@ function ProfileIntelligence({ profile, backendResponse, airQuality }) {
         <div className="profile-intelligence-actions">
           {content.actions.map((action, index) => (
             <div key={index}>
-              <span>✓</span>
+              <span>âœ“</span>
               <p>{action}</p>
             </div>
           ))}
@@ -721,7 +721,7 @@ function SavedPlaces({ places, onSelect, onRemove, onClose }) {
             <p className="eyebrow">YOUR PLACES</p>
             <h3>Saved Places</h3>
           </div>
-          <button type="button" className="saved-close" onClick={onClose}>×</button>
+          <button type="button" className="saved-close" onClick={onClose}>Ã—</button>
         </div>
 
         {places.length === 0 ? (
@@ -738,7 +738,7 @@ function SavedPlaces({ places, onSelect, onRemove, onClose }) {
                   <div className="saved-place-icon"><MapPin size={19} /></div>
                   <div>
                     <strong>{place.city}</strong>
-                    <span>{place.temperature}° • {place.outdoor} outdoor</span>
+                    <span>{place.temperature}Â° â€¢ {place.outdoor} outdoor</span>
                   </div>
                 </button>
                 <button
@@ -747,7 +747,7 @@ function SavedPlaces({ places, onSelect, onRemove, onClose }) {
                   aria-label={`Remove ${place.city}`}
                   onClick={() => onRemove(place.city)}
                 >
-                  ×
+                  Ã—
                 </button>
               </div>
             ))}
@@ -1012,14 +1012,14 @@ function FamilyDashboard({
             <div className="profile-metrics">
 
               <ProfileMetric
-                icon="🌡️"
+                icon="ðŸŒ¡ï¸"
                 label="Temperature"
-                value={`${temperature}°C`}
+                value={`${temperature}Â°C`}
                 description="Current conditions"
               />
 
               <ProfileMetric
-                icon="🌧️"
+                icon="ðŸŒ§ï¸"
                 label="Rain Chance"
                 value={
                   rain === "--"
@@ -1030,14 +1030,14 @@ function FamilyDashboard({
               />
 
               <ProfileMetric
-                icon="☀️"
+                icon="â˜€ï¸"
                 label="UV Index"
                 value={uv}
                 description="Sun exposure"
               />
 
               <ProfileMetric
-                icon="💨"
+                icon="ðŸ’¨"
                 label="Wind"
                 value={
                   wind === "--"
@@ -1058,7 +1058,7 @@ function FamilyDashboard({
             </h3>
 
             <ProfileRecommendation
-              icon="✓"
+              icon="âœ“"
               title="Check school commute"
               text={
                 rain !== "--" && rain >= 50
@@ -1068,14 +1068,14 @@ function FamilyDashboard({
             />
 
             <ProfileRecommendation
-              icon="☀️"
+              icon="â˜€ï¸"
               title="Use sun protection"
               text="Check UV conditions before extended outdoor activities."
               type="warning"
             />
 
             <ProfileRecommendation
-              icon="💧"
+              icon="ðŸ’§"
               title="Stay comfortable"
               text="Keep children hydrated during warm or humid conditions."
               type="info"
@@ -1096,7 +1096,7 @@ function FamilyDashboard({
           <div className="profile-card-heading">
             <div>
               <span className="profile-card-icon">
-                🚌
+                ðŸšŒ
               </span>
 
               <div>
@@ -1114,11 +1114,11 @@ function FamilyDashboard({
           <div className="time-weather-grid">
 
             {[
-              ["7 AM", "☁️", "24°C"],
-              ["9 AM", "🌤️", "26°C"],
-              ["12 PM", "☀️", "28°C"],
-              ["3 PM", "☁️", "27°C"],
-              ["6 PM", "🌧️", "25°C"],
+              ["7 AM", "â˜ï¸", "24Â°C"],
+              ["9 AM", "ðŸŒ¤ï¸", "26Â°C"],
+              ["12 PM", "â˜€ï¸", "28Â°C"],
+              ["3 PM", "â˜ï¸", "27Â°C"],
+              ["6 PM", "ðŸŒ§ï¸", "25Â°C"],
             ].map(([time, icon, temp]) => (
               <div
                 className="time-weather-card"
@@ -1136,7 +1136,7 @@ function FamilyDashboard({
           </div>
 
           <ProfileRecommendation
-            icon="🚌"
+            icon="ðŸšŒ"
             title={
               rain !== "--" && rain >= 50
                 ? "Rain may affect school travel"
@@ -1162,7 +1162,7 @@ function FamilyDashboard({
           <div className="profile-main-card">
 
             <h3>
-              ❤️ Health & Air Quality
+              â¤ï¸ Health & Air Quality
             </h3>
 
             <p>
@@ -1172,7 +1172,7 @@ function FamilyDashboard({
             <div className="profile-metrics three">
 
               <ProfileMetric
-                icon="🍃"
+                icon="ðŸƒ"
                 label="AQI"
                 value={aqi}
                 description={
@@ -1182,14 +1182,14 @@ function FamilyDashboard({
               />
 
               <ProfileMetric
-                icon="🌼"
+                icon="ðŸŒ¼"
                 label="Pollen"
                 value="Low"
                 description="Low current risk"
               />
 
               <ProfileMetric
-                icon="🌡️"
+                icon="ðŸŒ¡ï¸"
                 label="Heat Stress"
                 value={
                   typeof weather?.temperature === "number" &&
@@ -1212,7 +1212,7 @@ function FamilyDashboard({
 
             {alerts.length === 0 ? (
               <ProfileRecommendation
-                icon="✓"
+                icon="âœ“"
                 title="No severe weather alerts"
                 text="Conditions look safe for your family."
               />
@@ -1220,7 +1220,7 @@ function FamilyDashboard({
               alerts.slice(0, 3).map((alert) => (
                 <ProfileRecommendation
                   key={alert.id}
-                  icon="⚠️"
+                  icon="âš ï¸"
                   title={alert.title}
                   text={alert.message}
                   type="warning"
@@ -1241,7 +1241,7 @@ function FamilyDashboard({
         <div className="profile-main-card">
 
           <h3>
-            🌳 Outdoor Activities
+            ðŸŒ³ Outdoor Activities
           </h3>
 
           <p>
@@ -1251,19 +1251,19 @@ function FamilyDashboard({
           <div className="activity-grid">
 
             <div className="activity-card">
-              <span>🌳</span>
+              <span>ðŸŒ³</span>
               <strong>Parks & Play</strong>
               <b>Good</b>
             </div>
 
             <div className="activity-card">
-              <span>🚲</span>
+              <span>ðŸš²</span>
               <strong>Cycling</strong>
               <b>Good</b>
             </div>
 
             <div className="activity-card">
-              <span>⚽</span>
+              <span>âš½</span>
               <strong>Sports</strong>
               <b>Good</b>
             </div>
@@ -1339,16 +1339,16 @@ function ProfileSpecificContent({
 
       metrics: [
         {
-          icon: "🌡️",
+          icon: "ðŸŒ¡ï¸",
           label: "Temperature",
           value:
             temperature !== null
-              ? `${temperature}°C`
+              ? `${temperature}Â°C`
               : "--",
           description: "Current conditions",
         },
         {
-          icon: "🌧️",
+          icon: "ðŸŒ§ï¸",
           label: "Rain Chance",
           value:
             rain !== null
@@ -1357,7 +1357,7 @@ function ProfileSpecificContent({
           description: "Chance of rain",
         },
         {
-          icon: "☀️",
+          icon: "â˜€ï¸",
           label: "UV Index",
           value:
             uv !== null
@@ -1366,7 +1366,7 @@ function ProfileSpecificContent({
           description: "Sun exposure",
         },
         {
-          icon: "💨",
+          icon: "ðŸ’¨",
           label: "Wind",
           value:
             wind !== null
@@ -1378,7 +1378,7 @@ function ProfileSpecificContent({
 
       recommendations: [
         {
-          icon: "🚌",
+          icon: "ðŸšŒ",
           title:
             rain !== null && rain >= 50
               ? "Rain may affect school commute"
@@ -1393,13 +1393,13 @@ function ProfileSpecificContent({
               : "good",
         },
         {
-          icon: "☀️",
+          icon: "â˜€ï¸",
           title: "Use sun protection",
           text: "Check UV conditions before extended outdoor activities.",
           type: "warning",
         },
         {
-          icon: "💧",
+          icon: "ðŸ’§",
           title: "Keep children hydrated",
           text: "Warm or humid conditions can increase dehydration risk.",
           type: "info",
@@ -1433,16 +1433,16 @@ function ProfileSpecificContent({
 
       metrics: [
         {
-          icon: "🌡️",
+          icon: "ðŸŒ¡ï¸",
           label: "Temperature",
           value:
             temperature !== null
-              ? `${temperature}°C`
+              ? `${temperature}Â°C`
               : "--",
           description: "Comfort for travel",
         },
         {
-          icon: "🌧️",
+          icon: "ðŸŒ§ï¸",
           label: "Rain Chance",
           value:
             rain !== null
@@ -1451,7 +1451,7 @@ function ProfileSpecificContent({
           description: "Rain risk",
         },
         {
-          icon: "💨",
+          icon: "ðŸ’¨",
           label: "Wind",
           value:
             wind !== null
@@ -1460,7 +1460,7 @@ function ProfileSpecificContent({
           description: "Wind conditions",
         },
         {
-          icon: "👁️",
+          icon: "ðŸ‘ï¸",
           label: "Visibility",
           value: "Good",
           description: "Travel visibility",
@@ -1469,7 +1469,7 @@ function ProfileSpecificContent({
 
       recommendations: [
         {
-          icon: "✓",
+          icon: "âœ“",
           title:
             rain !== null && rain >= 60
               ? "High rain risk"
@@ -1484,13 +1484,13 @@ function ProfileSpecificContent({
               : "good",
         },
         {
-          icon: "☀️",
+          icon: "â˜€ï¸",
           title: "Carry suitable clothing",
           text: "Choose clothing according to temperature and UV conditions.",
           type: "warning",
         },
         {
-          icon: "💧",
+          icon: "ðŸ’§",
           title: "Stay hydrated",
           text: "Keep water with you during warm-weather travel.",
           type: "info",
@@ -1524,7 +1524,7 @@ function ProfileSpecificContent({
 
       metrics: [
         {
-          icon: "🌧️",
+          icon: "ðŸŒ§ï¸",
           label: "Rain Risk",
           value:
             rain !== null
@@ -1533,7 +1533,7 @@ function ProfileSpecificContent({
           description: "Chance of rain",
         },
         {
-          icon: "💨",
+          icon: "ðŸ’¨",
           label: "Wind",
           value:
             wind !== null
@@ -1542,13 +1542,13 @@ function ProfileSpecificContent({
           description: "Travel comfort",
         },
         {
-          icon: "👁️",
+          icon: "ðŸ‘ï¸",
           label: "Visibility",
           value: "Good",
           description: "Road visibility",
         },
         {
-          icon: "🚗",
+          icon: "ðŸš—",
           label: "Travel Impact",
           value:
             rain !== null && rain >= 60
@@ -1560,7 +1560,7 @@ function ProfileSpecificContent({
 
       recommendations: [
         {
-          icon: "✓",
+          icon: "âœ“",
           title:
             rain !== null && rain >= 60
               ? "Allow extra commute time"
@@ -1575,13 +1575,13 @@ function ProfileSpecificContent({
               : "good",
         },
         {
-          icon: "🕐",
+          icon: "ðŸ•",
           title: "Check your departure time",
           text: "Compare weather conditions across the morning and evening.",
           type: "info",
         },
         {
-          icon: "☔",
+          icon: "â˜”",
           title: "Keep rain protection ready",
           text: "Useful when rain probability increases.",
           type: "warning",
@@ -1615,16 +1615,16 @@ function ProfileSpecificContent({
 
       metrics: [
         {
-          icon: "🌡️",
+          icon: "ðŸŒ¡ï¸",
           label: "Temperature",
           value:
             temperature !== null
-              ? `${temperature}°C`
+              ? `${temperature}Â°C`
               : "--",
           description: "Crop heat conditions",
         },
         {
-          icon: "💧",
+          icon: "ðŸ’§",
           label: "Humidity",
           value:
             humidity !== null
@@ -1633,7 +1633,7 @@ function ProfileSpecificContent({
           description: "Field humidity",
         },
         {
-          icon: "🌧️",
+          icon: "ðŸŒ§ï¸",
           label: "Rain Chance",
           value:
             rain !== null
@@ -1642,7 +1642,7 @@ function ProfileSpecificContent({
           description: "Rainfall outlook",
         },
         {
-          icon: "💨",
+          icon: "ðŸ’¨",
           label: "Wind",
           value:
             wind !== null
@@ -1654,7 +1654,7 @@ function ProfileSpecificContent({
 
       recommendations: [
         {
-          icon: "🌾",
+          icon: "ðŸŒ¾",
           title:
             rain !== null && rain < 30
               ? "Good conditions for field work"
@@ -1669,7 +1669,7 @@ function ProfileSpecificContent({
               : "warning",
         },
         {
-          icon: "💧",
+          icon: "ðŸ’§",
           title:
             rain !== null && rain >= 50
               ? "Irrigation may not be required"
@@ -1681,7 +1681,7 @@ function ProfileSpecificContent({
           type: "info",
         },
         {
-          icon: "🌱",
+          icon: "ðŸŒ±",
           title: "Monitor crop conditions",
           text: "Use temperature and humidity trends when planning crop care.",
           type: "warning",
@@ -1715,16 +1715,16 @@ function ProfileSpecificContent({
 
       metrics: [
         {
-          icon: "🌡️",
+          icon: "ðŸŒ¡ï¸",
           label: "Temperature",
           value:
             temperature !== null
-              ? `${temperature}°C`
+              ? `${temperature}Â°C`
               : "--",
           description: "Running comfort",
         },
         {
-          icon: "💨",
+          icon: "ðŸ’¨",
           label: "Wind",
           value:
             wind !== null
@@ -1733,7 +1733,7 @@ function ProfileSpecificContent({
           description: "Wind conditions",
         },
         {
-          icon: "☀️",
+          icon: "â˜€ï¸",
           label: "UV Index",
           value:
             uv !== null
@@ -1742,7 +1742,7 @@ function ProfileSpecificContent({
           description: "Sun exposure",
         },
         {
-          icon: "💧",
+          icon: "ðŸ’§",
           label: "Humidity",
           value:
             humidity !== null
@@ -1754,7 +1754,7 @@ function ProfileSpecificContent({
 
       recommendations: [
         {
-          icon: "✓",
+          icon: "âœ“",
           title:
             temperature !== null && temperature >= 34
               ? "Avoid peak heat"
@@ -1769,13 +1769,13 @@ function ProfileSpecificContent({
               : "good",
         },
         {
-          icon: "☀️",
+          icon: "â˜€ï¸",
           title: "Use sun protection",
           text: "Protect exposed skin when UV levels are elevated.",
           type: "warning",
         },
         {
-          icon: "💧",
+          icon: "ðŸ’§",
           title: "Stay hydrated",
           text: "Drink water before and after outdoor exercise.",
           type: "info",
@@ -1809,16 +1809,16 @@ function ProfileSpecificContent({
 
       metrics: [
         {
-          icon: "🌡️",
+          icon: "ðŸŒ¡ï¸",
           label: "Temperature",
           value:
             temperature !== null
-              ? `${temperature}°C`
+              ? `${temperature}Â°C`
               : "--",
           description: "Guest comfort",
         },
         {
-          icon: "🌧️",
+          icon: "ðŸŒ§ï¸",
           label: "Rain Risk",
           value:
             rain !== null
@@ -1827,7 +1827,7 @@ function ProfileSpecificContent({
           description: "Outdoor rain risk",
         },
         {
-          icon: "💨",
+          icon: "ðŸ’¨",
           label: "Wind",
           value:
             wind !== null
@@ -1836,7 +1836,7 @@ function ProfileSpecificContent({
           description: "Wind comfort",
         },
         {
-          icon: "☀️",
+          icon: "â˜€ï¸",
           label: "UV",
           value:
             uv !== null
@@ -1848,7 +1848,7 @@ function ProfileSpecificContent({
 
       recommendations: [
         {
-          icon: rain !== null && rain >= 50 ? "⚠️" : "✓",
+          icon: rain !== null && rain >= 50 ? "âš ï¸" : "âœ“",
           title:
             rain !== null && rain >= 50
               ? "Prepare a rain backup"
@@ -1863,7 +1863,7 @@ function ProfileSpecificContent({
               : "good",
         },
         {
-          icon: "🌡️",
+          icon: "ðŸŒ¡ï¸",
           title:
             temperature !== null && temperature >= 34
               ? "Plan for heat"
@@ -1875,7 +1875,7 @@ function ProfileSpecificContent({
           type: "info",
         },
         {
-          icon: "🕐",
+          icon: "ðŸ•",
           title: "Choose the right time",
           text: "Use hourly conditions to select the most comfortable event window.",
           type: "info",
@@ -1909,16 +1909,16 @@ function ProfileSpecificContent({
 
       metrics: [
         {
-          icon: "🌡️",
+          icon: "ðŸŒ¡ï¸",
           label: "Temperature",
           value:
             temperature !== null
-              ? `${temperature}°C`
+              ? `${temperature}Â°C`
               : "--",
           description: "Plant heat conditions",
         },
         {
-          icon: "💧",
+          icon: "ðŸ’§",
           label: "Humidity",
           value:
             humidity !== null
@@ -1927,7 +1927,7 @@ function ProfileSpecificContent({
           description: "Garden humidity",
         },
         {
-          icon: "🌧️",
+          icon: "ðŸŒ§ï¸",
           label: "Rain Chance",
           value:
             rain !== null
@@ -1936,7 +1936,7 @@ function ProfileSpecificContent({
           description: "Natural rainfall",
         },
         {
-          icon: "☀️",
+          icon: "â˜€ï¸",
           label: "UV Index",
           value:
             uv !== null
@@ -1948,7 +1948,7 @@ function ProfileSpecificContent({
 
       recommendations: [
         {
-          icon: "💧",
+          icon: "ðŸ’§",
           title:
             rain !== null && rain >= 50
               ? "Reduce watering"
@@ -1960,7 +1960,7 @@ function ProfileSpecificContent({
           type: "info",
         },
         {
-          icon: "🌱",
+          icon: "ðŸŒ±",
           title: "Monitor plant stress",
           text:
             temperature !== null && temperature >= 35
@@ -1972,7 +1972,7 @@ function ProfileSpecificContent({
               : "good",
         },
         {
-          icon: "☀️",
+          icon: "â˜€ï¸",
           title: "Watch sun exposure",
           text: "Protect sensitive plants during periods of strong sunlight.",
           type: "warning",
@@ -2086,12 +2086,12 @@ function AlertProfileCard({ alerts = [] }) {
     <div className="profile-side-card">
 
       <h3>
-        🔔 Safety Alerts
+        ðŸ”” Safety Alerts
       </h3>
 
       {alerts.length === 0 ? (
         <ProfileRecommendation
-          icon="✓"
+          icon="âœ“"
           title="No severe weather alerts"
           text="No active weather alert is currently available for this location."
         />
@@ -2099,7 +2099,7 @@ function AlertProfileCard({ alerts = [] }) {
         alerts.slice(0, 3).map((alert) => (
           <ProfileRecommendation
             key={alert.id}
-            icon="⚠️"
+            icon="âš ï¸"
             title={alert.title}
             text={alert.message}
             type="warning"
@@ -2117,7 +2117,7 @@ function ActivityProfileCard() {
       <div className="profile-main-card">
 
         <h3>
-          🌳 Outdoor Activities
+          ðŸŒ³ Outdoor Activities
         </h3>
 
         <p>
@@ -2127,19 +2127,19 @@ function ActivityProfileCard() {
         <div className="activity-grid">
 
           <div className="activity-card">
-            <span>🌳</span>
+            <span>ðŸŒ³</span>
             <strong>Walking</strong>
             <b>Good</b>
           </div>
 
           <div className="activity-card">
-            <span>🏃</span>
+            <span>ðŸƒ</span>
             <strong>Running</strong>
             <b>Good</b>
           </div>
 
           <div className="activity-card">
-            <span>🧘</span>
+            <span>ðŸ§˜</span>
             <strong>Yoga</strong>
             <b>Good</b>
           </div>
@@ -2212,7 +2212,7 @@ function ProfileExtraSections({
                 <div>
 
                   <span className="profile-card-icon">
-                    🚌
+                    ðŸšŒ
                   </span>
 
                   <div>
@@ -2231,11 +2231,11 @@ function ProfileExtraSections({
               <div className="time-weather-grid">
 
                 {[
-                  ["7 AM", "☁️", "Morning"],
-                  ["9 AM", "🌤️", "School"],
-                  ["12 PM", "☀️", "Midday"],
-                  ["3 PM", "☁️", "Afternoon"],
-                  ["6 PM", "🌧️", "Evening"],
+                  ["7 AM", "â˜ï¸", "Morning"],
+                  ["9 AM", "ðŸŒ¤ï¸", "School"],
+                  ["12 PM", "â˜€ï¸", "Midday"],
+                  ["3 PM", "â˜ï¸", "Afternoon"],
+                  ["6 PM", "ðŸŒ§ï¸", "Evening"],
                 ].map(
                   ([time, icon, label]) => (
                     <div
@@ -2265,7 +2265,7 @@ function ProfileExtraSections({
               <div className="profile-main-card">
 
                 <h3>
-                  ❤️ Health & Air Quality
+                  â¤ï¸ Health & Air Quality
                 </h3>
 
                 <p>
@@ -2275,7 +2275,7 @@ function ProfileExtraSections({
                 <div className="profile-metrics three">
 
                   <ProfileMetric
-                    icon="🍃"
+                    icon="ðŸƒ"
                     label="AQI"
                     value={
                       airQuality
@@ -2293,14 +2293,14 @@ function ProfileExtraSections({
                   />
 
                   <ProfileMetric
-                    icon="🌼"
+                    icon="ðŸŒ¼"
                     label="Pollen"
                     value="Low"
                     description="Current risk"
                   />
 
                   <ProfileMetric
-                    icon="🌡️"
+                    icon="ðŸŒ¡ï¸"
                     label="Heat Stress"
                     value={
                       weather?.temperature >= 35
@@ -2340,7 +2340,7 @@ function ProfileExtraSections({
               <div className="profile-main-card">
 
                 <h3>
-                  🌍 Destination Weather
+                  ðŸŒ Destination Weather
                 </h3>
 
                 <p>
@@ -2350,18 +2350,18 @@ function ProfileExtraSections({
                 <div className="profile-metrics">
 
                   <ProfileMetric
-                    icon="🌡️"
+                    icon="ðŸŒ¡ï¸"
                     label="Temperature"
                     value={
                       weather?.temperature !== undefined
-                        ? `${weather.temperature}°C`
+                        ? `${weather.temperature}Â°C`
                         : "--"
                     }
                     description="Current"
                   />
 
                   <ProfileMetric
-                    icon="🌧️"
+                    icon="ðŸŒ§ï¸"
                     label="Rain"
                     value={
                       weather?.rain !== undefined
@@ -2372,14 +2372,14 @@ function ProfileExtraSections({
                   />
 
                   <ProfileMetric
-                    icon="☀️"
+                    icon="â˜€ï¸"
                     label="UV"
                     value={weather?.uv ?? "--"}
                     description="Sun intensity"
                   />
 
                   <ProfileMetric
-                    icon="💨"
+                    icon="ðŸ’¨"
                     label="Wind"
                     value={
                       weather?.wind !== undefined
@@ -2396,7 +2396,7 @@ function ProfileExtraSections({
               <div className="profile-side-card">
 
                 <h3>
-                  🎒 Packing Suggestions
+                  ðŸŽ’ Packing Suggestions
                 </h3>
 
                 {[
@@ -2410,7 +2410,7 @@ function ProfileExtraSections({
                     className="packing-item"
                     key={item}
                   >
-                    ✓ {item}
+                    âœ“ {item}
                   </div>
                 ))}
 
@@ -2425,7 +2425,7 @@ function ProfileExtraSections({
             <div className="profile-main-card">
 
               <h3>
-                📅 Destination Forecast
+                ðŸ“… Destination Forecast
               </h3>
 
               <p>
@@ -2450,7 +2450,7 @@ function ProfileExtraSections({
                           </strong>
 
                           <span>
-                            {forecast.temperature_2m_max?.[index] ?? "--"}°
+                            {forecast.temperature_2m_max?.[index] ?? "--"}Â°
                           </span>
                         </div>
                       ))
@@ -2481,7 +2481,7 @@ function ProfileExtraSections({
               <div className="profile-main-card">
 
                 <h3>
-                  🚗 Best Time to Leave
+                  ðŸš— Best Time to Leave
                 </h3>
 
                 <p>
@@ -2491,9 +2491,9 @@ function ProfileExtraSections({
                 <div className="time-weather-grid">
 
                   {[
-                    ["7–9 AM", "Good"],
-                    ["12–2 PM", "Good"],
-                    ["5–7 PM", "Check"],
+                    ["7â€“9 AM", "Good"],
+                    ["12â€“2 PM", "Good"],
+                    ["5â€“7 PM", "Check"],
                   ].map(
                     ([time, status]) => (
                       <div
@@ -2501,7 +2501,7 @@ function ProfileExtraSections({
                         key={time}
                       >
                         <strong>{time}</strong>
-                        <span>🕐</span>
+                        <span>ðŸ•</span>
                         <b>{status}</b>
                         <small>
                           Weather window
@@ -2527,13 +2527,13 @@ function ProfileExtraSections({
             <div className="profile-main-card">
 
               <h3>
-                🛣️ Road & Weather Conditions
+                ðŸ›£ï¸ Road & Weather Conditions
               </h3>
 
               <div className="profile-recommendation">
 
                 <div className="profile-recommendation-icon">
-                  ✓
+                  âœ“
                 </div>
 
                 <div>
@@ -2569,7 +2569,7 @@ function ProfileExtraSections({
               <div className="profile-main-card">
 
                 <h3>
-                  🌾 Field Conditions
+                  ðŸŒ¾ Field Conditions
                 </h3>
 
                 <p>
@@ -2579,18 +2579,18 @@ function ProfileExtraSections({
                 <div className="profile-metrics">
 
                   <ProfileMetric
-                    icon="🌡️"
+                    icon="ðŸŒ¡ï¸"
                     label="Temperature"
                     value={
                       weather?.temperature !== undefined
-                        ? `${weather.temperature}°C`
+                        ? `${weather.temperature}Â°C`
                         : "--"
                     }
                     description="Crop conditions"
                   />
 
                   <ProfileMetric
-                    icon="💧"
+                    icon="ðŸ’§"
                     label="Humidity"
                     value={
                       weather?.humidity !== undefined
@@ -2601,7 +2601,7 @@ function ProfileExtraSections({
                   />
 
                   <ProfileMetric
-                    icon="🌧️"
+                    icon="ðŸŒ§ï¸"
                     label="Rain"
                     value={
                       weather?.rain !== undefined
@@ -2612,7 +2612,7 @@ function ProfileExtraSections({
                   />
 
                   <ProfileMetric
-                    icon="💨"
+                    icon="ðŸ’¨"
                     label="Wind"
                     value={
                       weather?.wind !== undefined
@@ -2629,17 +2629,17 @@ function ProfileExtraSections({
               <div className="profile-side-card">
 
                 <h3>
-                  🚜 Farm Recommendations
+                  ðŸšœ Farm Recommendations
                 </h3>
 
                 <ProfileRecommendation
-                  icon="✓"
+                  icon="âœ“"
                   title="Field work"
                   text="Review rainfall and wind before outdoor operations."
                 />
 
                 <ProfileRecommendation
-                  icon="💧"
+                  icon="ðŸ’§"
                   title="Irrigation"
                   text={
                     weather?.rain >= 50
@@ -2650,7 +2650,7 @@ function ProfileExtraSections({
                 />
 
                 <ProfileRecommendation
-                  icon="🌱"
+                  icon="ðŸŒ±"
                   title="Crop monitoring"
                   text="Watch temperature and humidity trends."
                   type="warning"
@@ -2667,7 +2667,7 @@ function ProfileExtraSections({
             <div className="profile-main-card">
 
               <h3>
-                🌧️ Rainfall & Irrigation
+                ðŸŒ§ï¸ Rainfall & Irrigation
               </h3>
 
               <p>
@@ -2727,7 +2727,7 @@ function ProfileExtraSections({
               <div className="profile-main-card">
 
                 <h3>
-                  🏃 Best Time to Exercise
+                  ðŸƒ Best Time to Exercise
                 </h3>
 
                 <p>
@@ -2737,22 +2737,22 @@ function ProfileExtraSections({
                 <div className="time-weather-grid">
 
                   <div className="time-weather-card">
-                    <strong>5–8 AM</strong>
-                    <span>🌅</span>
+                    <strong>5â€“8 AM</strong>
+                    <span>ðŸŒ…</span>
                     <b>Best</b>
                     <small>Cooler hours</small>
                   </div>
 
                   <div className="time-weather-card">
-                    <strong>5–7 PM</strong>
-                    <span>🌇</span>
+                    <strong>5â€“7 PM</strong>
+                    <span>ðŸŒ‡</span>
                     <b>Good</b>
                     <small>Evening window</small>
                   </div>
 
                   <div className="time-weather-card">
-                    <strong>12–2 PM</strong>
-                    <span>☀️</span>
+                    <strong>12â€“2 PM</strong>
+                    <span>â˜€ï¸</span>
                     <b>Avoid</b>
                     <small>Peak sun</small>
                   </div>
@@ -2764,25 +2764,25 @@ function ProfileExtraSections({
               <div className="profile-side-card">
 
                 <h3>
-                  ❤️ Health & Safety
+                  â¤ï¸ Health & Safety
                 </h3>
 
                 <ProfileRecommendation
-                  icon="☀️"
+                  icon="â˜€ï¸"
                   title="UV protection"
                   text="Use sun protection when UV levels are elevated."
                   type="warning"
                 />
 
                 <ProfileRecommendation
-                  icon="💧"
+                  icon="ðŸ’§"
                   title="Hydration"
                   text="Drink water before and after outdoor activity."
                   type="info"
                 />
 
                 <ProfileRecommendation
-                  icon="🌡️"
+                  icon="ðŸŒ¡ï¸"
                   title="Heat"
                   text={
                     weather?.temperature >= 34
@@ -2820,7 +2820,7 @@ function ProfileExtraSections({
               <div className="profile-main-card">
 
                 <h3>
-                  🎉 Event Conditions
+                  ðŸŽ‰ Event Conditions
                 </h3>
 
                 <p>
@@ -2830,18 +2830,18 @@ function ProfileExtraSections({
                 <div className="profile-metrics">
 
                   <ProfileMetric
-                    icon="🌡️"
+                    icon="ðŸŒ¡ï¸"
                     label="Temperature"
                     value={
                       weather?.temperature !== undefined
-                        ? `${weather.temperature}°C`
+                        ? `${weather.temperature}Â°C`
                         : "--"
                     }
                     description="Guest comfort"
                   />
 
                   <ProfileMetric
-                    icon="🌧️"
+                    icon="ðŸŒ§ï¸"
                     label="Rain Risk"
                     value={
                       weather?.rain !== undefined
@@ -2852,7 +2852,7 @@ function ProfileExtraSections({
                   />
 
                   <ProfileMetric
-                    icon="💨"
+                    icon="ðŸ’¨"
                     label="Wind"
                     value={
                       weather?.wind !== undefined
@@ -2863,7 +2863,7 @@ function ProfileExtraSections({
                   />
 
                   <ProfileMetric
-                    icon="☀️"
+                    icon="â˜€ï¸"
                     label="UV"
                     value={weather?.uv ?? "--"}
                     description="Sun intensity"
@@ -2876,11 +2876,11 @@ function ProfileExtraSections({
               <div className="profile-side-card">
 
                 <h3>
-                  🏕️ Backup Plan
+                  ðŸ•ï¸ Backup Plan
                 </h3>
 
                 <ProfileRecommendation
-                  icon="✓"
+                  icon="âœ“"
                   title={
                     weather?.rain >= 50
                       ? "Prepare a covered backup"
@@ -2909,28 +2909,28 @@ function ProfileExtraSections({
             <div className="profile-main-card">
 
               <h3>
-                🕐 Best Event Time
+                ðŸ• Best Event Time
               </h3>
 
               <div className="time-weather-grid">
 
                 <div className="time-weather-card">
                   <strong>Morning</strong>
-                  <span>🌤️</span>
+                  <span>ðŸŒ¤ï¸</span>
                   <b>Good</b>
                   <small>Check hourly forecast</small>
                 </div>
 
                 <div className="time-weather-card">
                   <strong>Afternoon</strong>
-                  <span>☀️</span>
+                  <span>â˜€ï¸</span>
                   <b>Moderate</b>
                   <small>Watch UV and heat</small>
                 </div>
 
                 <div className="time-weather-card">
                   <strong>Evening</strong>
-                  <span>🌇</span>
+                  <span>ðŸŒ‡</span>
                   <b>Good</b>
                   <small>Check rain risk</small>
                 </div>
@@ -2956,7 +2956,7 @@ function ProfileExtraSections({
               <div className="profile-main-card">
 
                 <h3>
-                  🌱 Garden Conditions
+                  ðŸŒ± Garden Conditions
                 </h3>
 
                 <p>
@@ -2966,18 +2966,18 @@ function ProfileExtraSections({
                 <div className="profile-metrics">
 
                   <ProfileMetric
-                    icon="🌡️"
+                    icon="ðŸŒ¡ï¸"
                     label="Temperature"
                     value={
                       weather?.temperature !== undefined
-                        ? `${weather.temperature}°C`
+                        ? `${weather.temperature}Â°C`
                         : "--"
                     }
                     description="Plant heat"
                   />
 
                   <ProfileMetric
-                    icon="💧"
+                    icon="ðŸ’§"
                     label="Humidity"
                     value={
                       weather?.humidity !== undefined
@@ -2988,7 +2988,7 @@ function ProfileExtraSections({
                   />
 
                   <ProfileMetric
-                    icon="🌧️"
+                    icon="ðŸŒ§ï¸"
                     label="Rain"
                     value={
                       weather?.rain !== undefined
@@ -2999,7 +2999,7 @@ function ProfileExtraSections({
                   />
 
                   <ProfileMetric
-                    icon="☀️"
+                    icon="â˜€ï¸"
                     label="UV"
                     value={weather?.uv ?? "--"}
                     description="Sun intensity"
@@ -3012,11 +3012,11 @@ function ProfileExtraSections({
               <div className="profile-side-card">
 
                 <h3>
-                  💧 Watering Recommendation
+                  ðŸ’§ Watering Recommendation
                 </h3>
 
                 <ProfileRecommendation
-                  icon="💧"
+                  icon="ðŸ’§"
                   title={
                     weather?.rain >= 50
                       ? "Reduce watering"
@@ -3031,7 +3031,7 @@ function ProfileExtraSections({
                 />
 
                 <ProfileRecommendation
-                  icon="🌱"
+                  icon="ðŸŒ±"
                   title="Plant care"
                   text={
                     weather?.temperature >= 35
@@ -3056,13 +3056,13 @@ function ProfileExtraSections({
             <div className="profile-main-card">
 
               <h3>
-                🌦️ Weather Risks
+                ðŸŒ¦ï¸ Weather Risks
               </h3>
 
               <div className="activity-grid">
 
                 <div className="activity-card">
-                  <span>🌧️</span>
+                  <span>ðŸŒ§ï¸</span>
                   <strong>Heavy Rain</strong>
                   <b>
                     {weather?.rain >= 60
@@ -3072,7 +3072,7 @@ function ProfileExtraSections({
                 </div>
 
                 <div className="activity-card">
-                  <span>☀️</span>
+                  <span>â˜€ï¸</span>
                   <strong>High Heat</strong>
                   <b>
                     {weather?.temperature >= 35
@@ -3082,7 +3082,7 @@ function ProfileExtraSections({
                 </div>
 
                 <div className="activity-card">
-                  <span>💨</span>
+                  <span>ðŸ’¨</span>
                   <strong>Strong Wind</strong>
                   <b>
                     {weather?.wind >= 30
@@ -3141,43 +3141,43 @@ function App() {
     {
       id: "runner",
       title: "Runner",
-      icon: "🏃",
+      icon: "ðŸƒ",
       description: "Best running time, heat, UV, rain and wind.",
     },
     {
       id: "farmer",
       title: "Farmer",
-      icon: "🌾",
+      icon: "ðŸŒ¾",
       description: "Rainfall, temperature, humidity and field conditions.",
     },
     {
       id: "family",
       title: "Family",
-      icon: "👨‍👩‍👧",
+      icon: "ðŸ‘¨â€ðŸ‘©â€ðŸ‘§",
       description: "School commute, AQI, rain and severe weather awareness.",
     },
     {
       id: "traveler",
       title: "Traveler",
-      icon: "✈️",
+      icon: "âœˆï¸",
       description: "Travel suitability, weather risks and packing guidance.",
     },
     {
       id: "event",
       title: "Event Planner",
-      icon: "💍",
+      icon: "ðŸ’",
       description: "Outdoor event suitability and backup planning.",
     },
     {
       id: "commute",
       title: "Office Commute",
-      icon: "💼",
+      icon: "ðŸ’¼",
       description: "Rain, wind and weather-aware commuting.",
     },
     {
       id: "gardener",
       title: "Gardener",
-      icon: "🌱",
+      icon: "ðŸŒ±",
       description: "Watering, heat, humidity and plant-care guidance.",
     },
   ];
@@ -3244,7 +3244,7 @@ function App() {
 
   const [showNotifications, setShowNotifications] = useState(false);
   const [showChat, setShowChat] = useState(false);
-  const [chatMessages, setChatMessages] = useState([{ role: "assistant", text: "Hi! I’m WeatherWise. Ask me about today’s weather, outdoor plans, travel, health or your selected profile." }]);
+  const [chatMessages, setChatMessages] = useState([{ role: "assistant", text: "Hi! Iâ€™m WeatherWise. Ask me about todayâ€™s weather, outdoor plans, travel, health or your selected profile." }]);
   const [chatInput, setChatInput] = useState("");
 
   useEffect(() => {
@@ -3281,13 +3281,13 @@ function App() {
 
 
   const getAlertIcon = (type) => {
-    if (type === "heat") return "🌡️";
-    if (type === "rain") return "🌧️";
-    if (type === "wind") return "💨";
-    if (type === "storm") return "⛈️";
-    if (type === "uv") return "☀️";
-    if (type === "air") return "😷";
-    return "⚠️";
+    if (type === "heat") return "ðŸŒ¡ï¸";
+    if (type === "rain") return "ðŸŒ§ï¸";
+    if (type === "wind") return "ðŸ’¨";
+    if (type === "storm") return "â›ˆï¸";
+    if (type === "uv") return "â˜€ï¸";
+    if (type === "air") return "ðŸ˜·";
+    return "âš ï¸";
   };
 
   const loadAlerts = async () => {
@@ -3462,181 +3462,77 @@ const saveProfile = (profileId) => {
       async (position) => {
         const latitude = position.coords.latitude;
         const longitude = position.coords.longitude;
-
-        setCoordinates({
-          latitude,
-          longitude,
-        });
-
-        setWeather({
-          city: "Detecting location...",
-          temperature: "--",
-          rain: "--",
-          outdoor: "--",
-          uv: "--",
-          wind: "--",
-        });
+        setCoordinates({ latitude, longitude });
+        setWeather({ city: "Detecting location...", temperature: "--", rain: "--", outdoor: "--", uv: "--", wind: "--" });
 
         try {
-          // STEP 1: Weather is required.
-          const weatherResponse = await fetch(
-            `${API_BASE}/api/weather?latitude=${latitude}&longitude=${longitude}`
-          );
-
-          if (!weatherResponse.ok) {
-            throw new Error(
-              `Weather backend request failed (${weatherResponse.status})`
-            );
-          }
+          const weatherResponse = await fetch(`${API_BASE}/api/weather?latitude=${latitude}&longitude=${longitude}`);
+          if (!weatherResponse.ok) throw new Error(`Weather backend request failed (${weatherResponse.status})`);
 
           const weatherData = await weatherResponse.json();
           const current = weatherData?.current;
+          if (!current) throw new Error("Weather response did not contain current data.");
 
-          if (!current) {
-            throw new Error("Weather response did not contain current data.");
-          }
+          const rainProbability = weatherData?.hourly?.precipitation_probability?.[0];
+          const outdoor = weatherData?.intelligence?.outdoor;
+          const weatherCard = {
+            city: "Your Location",
+            temperature: current.temperature_2m != null ? Math.round(current.temperature_2m) : "--",
+            rain: rainProbability != null ? Math.round(rainProbability) : "--",
+            outdoor: outdoor?.status || "Moderate",
+            uv: current.uv_index != null ? Math.round(current.uv_index) : "--",
+            wind: current.wind_speed_10m != null ? Math.round(current.wind_speed_10m) : "--",
+          };
 
-          // STEP 2: Location name is required for a useful UI.
-          const locationResponse = await fetch(
-            `${API_BASE}/api/location?latitude=${latitude}&longitude=${longitude}`
-          );
+          // Weather is the only required request for the homepage.
+          setWeather(weatherCard);
+          setBackendResponse(weatherData);
+          setLocationName("Your Location");
+          setError("");
 
-          if (!locationResponse.ok) {
-            throw new Error(
-              `Location backend request failed (${locationResponse.status})`
-            );
-          }
-
-          const locationData = await locationResponse.json();
-
-          const placeName = [
-            locationData?.city,
-            locationData?.state,
-          ]
-            .filter(Boolean)
-            .join(", ");
-
-          // STEP 3: AQI is optional.
-          // If this endpoint fails, weather and location still load.
+          // City-name lookup is optional and must never hide loaded weather.
           try {
-            const airQualityResponse = await fetch(
-              `${API_BASE}/api/air-quality?latitude=${latitude}&longitude=${longitude}`
-            );
-
-            if (!airQualityResponse.ok) {
-              throw new Error(
-                `Air quality backend request failed (${airQualityResponse.status})`
-              );
+            const locationResponse = await fetch(`${API_BASE}/api/location?latitude=${latitude}&longitude=${longitude}`);
+            if (locationResponse.ok) {
+              const locationData = await locationResponse.json();
+              const placeName = [locationData?.city, locationData?.state].filter(Boolean).join(", ") || locationData?.country;
+              if (placeName) {
+                setWeather((previous) => ({ ...previous, city: placeName }));
+                setLocationName(placeName);
+              }
             }
+          } catch (locationError) {
+            console.warn("City-name lookup failed; weather remains available.", locationError);
+          }
 
-            const airQualityData = await airQualityResponse.json();
-            setAirQuality(airQualityData);
+          // AQI is optional too.
+          try {
+            const airQualityResponse = await fetch(`${API_BASE}/api/air-quality?latitude=${latitude}&longitude=${longitude}`);
+            if (!airQualityResponse.ok) throw new Error(`Air quality backend request failed (${airQualityResponse.status})`);
+            setAirQuality(await airQualityResponse.json());
           } catch (airError) {
-            console.warn(
-              "Air quality could not be loaded. WeatherWise will continue without AQI.",
-              airError
-            );
+            console.warn("Air quality could not be loaded. WeatherWise will continue without AQI.", airError);
             setAirQuality(null);
           }
-
-          // STEP 4: Build the main weather card safely.
-          const rainProbability =
-            weatherData?.hourly?.precipitation_probability?.[0];
-
-          const outdoor =
-            weatherData?.intelligence?.outdoor;
-
-          setWeather({
-            city:
-              placeName ||
-              locationData?.country ||
-              "Your Location",
-
-            temperature:
-              current.temperature_2m != null
-                ? Math.round(current.temperature_2m)
-                : "--",
-
-            rain:
-              rainProbability != null
-                ? Math.round(rainProbability)
-                : "--",
-
-            outdoor:
-              outdoor?.status || "Moderate",
-
-            uv:
-              current.uv_index != null
-                ? Math.round(current.uv_index)
-                : "--",
-
-            wind:
-              current.wind_speed_10m != null
-                ? Math.round(current.wind_speed_10m)
-                : "--",
-          });
-
-          // STEP 5: Store the human-readable location.
-          setLocationName(
-            placeName ||
-              locationData?.country ||
-              "Your Location"
-          );
-
-          // STEP 6: Store the complete weather response
-          // for forecast, hourly planning and other features.
-          setBackendResponse(weatherData);
-
-          setError("");
         } catch (backendError) {
           console.error("Current-location weather flow failed:", backendError);
-
           setError(
             backendError.message?.includes("Weather backend")
               ? "WeatherWise could not retrieve live weather data. Make sure the FastAPI backend is running."
-              : backendError.message?.includes("Location backend")
-              ? "Weather loaded, but the location name could not be retrieved."
               : "Location detected, but WeatherWise could not load the required weather data."
           );
         } finally {
           setLocationLoading(false);
         }
       },
-
       (geoError) => {
         setLocationLoading(false);
-
-        switch (geoError.code) {
-          case geoError.PERMISSION_DENIED:
-            setError(
-              "Location permission was denied. Please allow location access."
-            );
-            break;
-
-          case geoError.POSITION_UNAVAILABLE:
-            setError(
-              "Your location could not be determined."
-            );
-            break;
-
-          case geoError.TIMEOUT:
-            setError(
-              "Location request timed out. Please try again."
-            );
-            break;
-
-          default:
-            setError(
-              "Unable to detect your location."
-            );
-        }
+        if (geoError.code === geoError.PERMISSION_DENIED) setError("Location permission was denied. Please allow location access.");
+        else if (geoError.code === geoError.POSITION_UNAVAILABLE) setError("Your location could not be determined.");
+        else if (geoError.code === geoError.TIMEOUT) setError("Location request timed out. Please try again.");
+        else setError("Unable to detect your location.");
       },
-
-      {
-        enableHighAccuracy: true,
-        timeout: 10000,
-        maximumAge: 0,
-      }
+      { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
     );
   };
 
@@ -3785,10 +3681,10 @@ const saveProfile = (profileId) => {
     }
 
     if (q.includes("run") || q.includes("running") || q.includes("outside")) {
-      if (temp >= 34) return `It is ${Math.round(temp)}°C with elevated heat. Prefer a cooler morning or evening period for running.`;
+      if (temp >= 34) return `It is ${Math.round(temp)}Â°C with elevated heat. Prefer a cooler morning or evening period for running.`;
       if (rain >= 60) return `Rain probability is around ${Math.round(rain)}%. Consider waiting for a clearer hour.`;
-      if (uv >= 8) return `The temperature is ${Math.round(temp)}°C, but UV is very high. Avoid peak sun hours and use sun protection.`;
-      return `Current conditions are ${Math.round(temp)}°C with ${Math.round(rain)}% rain probability and ${Math.round(wind)} km/h wind. They look reasonably suitable for outdoor activity.`;
+      if (uv >= 8) return `The temperature is ${Math.round(temp)}Â°C, but UV is very high. Avoid peak sun hours and use sun protection.`;
+      return `Current conditions are ${Math.round(temp)}Â°C with ${Math.round(rain)}% rain probability and ${Math.round(wind)} km/h wind. They look reasonably suitable for outdoor activity.`;
     }
 
     if (q.includes("aqi") || q.includes("air quality") || q.includes("pollution")) {
@@ -3798,16 +3694,16 @@ const saveProfile = (profileId) => {
     }
 
     if (q.includes("temperature") || q.includes("hot") || q.includes("cold")) {
-      return `The current temperature is ${Math.round(temp)}°C, with wind around ${Math.round(wind)} km/h and UV index ${uv != null ? Math.round(uv) : "--"}.`;
+      return `The current temperature is ${Math.round(temp)}Â°C, with wind around ${Math.round(wind)} km/h and UV index ${uv != null ? Math.round(uv) : "--"}.`;
     }
 
     if (q.includes("travel") || q.includes("trip")) {
       return rain >= 60 || wind >= 30
         ? `Travel conditions need some caution: rain probability is ${Math.round(rain)}% and wind is ${Math.round(wind)} km/h.`
-        : `Travel conditions currently look manageable: ${Math.round(temp)}°C, ${Math.round(rain)}% rain probability and ${Math.round(wind)} km/h wind.`;
+        : `Travel conditions currently look manageable: ${Math.round(temp)}Â°C, ${Math.round(rain)}% rain probability and ${Math.round(wind)} km/h wind.`;
     }
 
-    return `Right now it is ${Math.round(temp)}°C with ${Math.round(rain)}% rain probability, ${Math.round(wind)} km/h wind and UV ${uv != null ? Math.round(uv) : "--"}. Tell me what you’re planning and I’ll turn that into a practical recommendation.`;
+    return `Right now it is ${Math.round(temp)}Â°C with ${Math.round(rain)}% rain probability, ${Math.round(wind)} km/h wind and UV ${uv != null ? Math.round(uv) : "--"}. Tell me what youâ€™re planning and Iâ€™ll turn that into a practical recommendation.`;
   };
 
   const handleChatSubmit = (event) => {
@@ -4013,8 +3909,8 @@ const saveProfile = (profileId) => {
                 <MapPin size={15} />
 
                 {locationName
-                  ? `${locationName} • `
-                  : "Location detected • "}
+                  ? `${locationName} â€¢ `
+                  : "Location detected â€¢ "}
 
                 {coordinates.latitude.toFixed(4)},{" "}
                 {coordinates.longitude.toFixed(4)}
@@ -4069,7 +3965,7 @@ const saveProfile = (profileId) => {
                   {weather.temperature}
 
                   {weather.temperature !== "--" &&
-                    "°"}
+                    "Â°"}
 
                 </div>
 
@@ -4367,7 +4263,7 @@ const saveProfile = (profileId) => {
                 className="panel-close"
                 onClick={() => setShowNotifications(false)}
               >
-                ×
+                Ã—
               </button>
             </div>
 
@@ -4414,7 +4310,7 @@ const saveProfile = (profileId) => {
                       notificationSettings[key] ? "setting-check-on" : ""
                     }`}
                   >
-                    {notificationSettings[key] ? "✓" : ""}
+                    {notificationSettings[key] ? "âœ“" : ""}
                   </span>
                 </button>
               ))}
@@ -4442,7 +4338,7 @@ const saveProfile = (profileId) => {
                 <h2>Plan your trip</h2>
                 <p>Check destination weather before you travel.</p>
               </div>
-              <button className="panel-close" onClick={() => setShowTravelPlanner(false)}>×</button>
+              <button className="panel-close" onClick={() => setShowTravelPlanner(false)}>Ã—</button>
             </div>
 
             <form className="travel-form" onSubmit={handleTravelSubmit}>
@@ -4531,10 +4427,10 @@ const saveProfile = (profileId) => {
 
                 {travelResult.summary && (
                   <div className="travel-summary">
-                    <div><strong>{travelResult.summary.avg_temperature ?? "—"}°C</strong><span>Avg. temperature</span></div>
-                    <div><strong>{travelResult.summary.max_rain_probability ?? "—"}%</strong><span>Rain chance</span></div>
-                    <div><strong>{travelResult.summary.max_wind_speed ?? "—"} km/h</strong><span>Max wind</span></div>
-                    <div><strong>{travelResult.summary.max_uv_index ?? "—"}</strong><span>UV index</span></div>
+                    <div><strong>{travelResult.summary.avg_temperature ?? "â€”"}Â°C</strong><span>Avg. temperature</span></div>
+                    <div><strong>{travelResult.summary.max_rain_probability ?? "â€”"}%</strong><span>Rain chance</span></div>
+                    <div><strong>{travelResult.summary.max_wind_speed ?? "â€”"} km/h</strong><span>Max wind</span></div>
+                    <div><strong>{travelResult.summary.max_uv_index ?? "â€”"}</strong><span>UV index</span></div>
                   </div>
                 )}
 
@@ -4548,7 +4444,7 @@ const saveProfile = (profileId) => {
                           <span>{day.weather}</span>
                         </div>
                         <div className="travel-day-weather">
-                          <strong>{day.max_temperature}° / {day.min_temperature}°</strong>
+                          <strong>{day.max_temperature}Â° / {day.min_temperature}Â°</strong>
                           <span>{day.rain_probability}% rain</span>
                         </div>
                       </div>
@@ -4558,15 +4454,15 @@ const saveProfile = (profileId) => {
 
                 <div className="travel-advice-grid">
                   <div>
-                    <h4>🎒 What to pack</h4>
+                    <h4>ðŸŽ’ What to pack</h4>
                     {travelResult.packing?.map((item, index) => (
-                      <div className="travel-list-item" key={index}><span>✓</span>{item}</div>
+                      <div className="travel-list-item" key={index}><span>âœ“</span>{item}</div>
                     ))}
                   </div>
                   <div>
                     <h4>Travel advice</h4>
                     {travelResult.advice?.map((item, index) => (
-                      <div className="travel-list-item" key={index}><span>✓</span>{item}</div>
+                      <div className="travel-list-item" key={index}><span>âœ“</span>{item}</div>
                     ))}
                   </div>
                 </div>
@@ -4593,7 +4489,7 @@ const saveProfile = (profileId) => {
                 <h2>Plan your event</h2>
                 <p>Check weather risk before you finalize the schedule.</p>
               </div>
-              <button className="panel-close" onClick={() => setShowEventPlanner(false)}>×</button>
+              <button className="panel-close" onClick={() => setShowEventPlanner(false)}>Ã—</button>
             </div>
 
             <form className="event-form" onSubmit={handleEventSubmit}>
@@ -4711,10 +4607,10 @@ const saveProfile = (profileId) => {
 
                 {eventResult.metrics && (
                   <div className="event-metrics">
-                    <div><strong>{eventResult.metrics.temperature ?? "—"}°C</strong><span>Temperature</span></div>
-                    <div><strong>{eventResult.metrics.rain_probability ?? "—"}%</strong><span>Rain chance</span></div>
-                    <div><strong>{eventResult.metrics.wind_speed ?? "—"} km/h</strong><span>Wind</span></div>
-                    <div><strong>{eventResult.metrics.uv_index ?? "—"}</strong><span>UV index</span></div>
+                    <div><strong>{eventResult.metrics.temperature ?? "â€”"}Â°C</strong><span>Temperature</span></div>
+                    <div><strong>{eventResult.metrics.rain_probability ?? "â€”"}%</strong><span>Rain chance</span></div>
+                    <div><strong>{eventResult.metrics.wind_speed ?? "â€”"} km/h</strong><span>Wind</span></div>
+                    <div><strong>{eventResult.metrics.uv_index ?? "â€”"}</strong><span>UV index</span></div>
                   </div>
                 )}
 
@@ -4723,7 +4619,7 @@ const saveProfile = (profileId) => {
                     <h4>What WeatherWise recommends</h4>
                     {eventResult.recommendations.map((item, index) => (
                       <div className="event-recommendation" key={index}>
-                        <span>✓</span>
+                        <span>âœ“</span>
                         <p>{item}</p>
                       </div>
                     ))}
@@ -4756,7 +4652,7 @@ const saveProfile = (profileId) => {
                 className="panel-close"
                 onClick={() => setShowAlerts(false)}
               >
-                ×
+                Ã—
               </button>
             </div>
 
@@ -4773,7 +4669,7 @@ const saveProfile = (profileId) => {
               </div>
             ) : alerts.length === 0 ? (
               <div className="alerts-empty alerts-clear">
-                <span>✓</span>
+                <span>âœ“</span>
                 <strong>No severe alerts right now</strong>
                 <p>No major weather risk was detected from the available forecast data.</p>
               </div>
@@ -4829,7 +4725,7 @@ const saveProfile = (profileId) => {
                 className="panel-close"
                 onClick={() => setShowProfile(false)}
               >
-                ×
+                Ã—
               </button>
             </div>
 
@@ -4851,7 +4747,7 @@ const saveProfile = (profileId) => {
                   </span>
 
                   {activeProfile === profile.id && (
-                    <span className="profile-check">✓</span>
+                    <span className="profile-check">âœ“</span>
                   )}
                 </button>
               ))}
@@ -4885,13 +4781,13 @@ const saveProfile = (profileId) => {
                 <h2>Ask WeatherWise</h2>
                 <p>Answers are based on the weather data loaded for your location.</p>
               </div>
-              <button type="button" className="panel-close" onClick={() => setShowChat(false)}>×</button>
+              <button type="button" className="panel-close" onClick={() => setShowChat(false)}>Ã—</button>
             </div>
 
             <div className="chat-messages">
               {chatMessages.map((message, index) => (
                 <div className={`chat-message chat-${message.role}`} key={index}>
-                  <span>{message.role === "assistant" ? "☀️" : "You"}</span>
+                  <span>{message.role === "assistant" ? "â˜€ï¸" : "You"}</span>
                   <p>{message.text}</p>
                 </div>
               ))}
@@ -4912,7 +4808,7 @@ const saveProfile = (profileId) => {
       {/* OPENSTREETMAP ATTRIBUTION */}
 
       <footer className="footer">
-        Location data © OpenStreetMap contributors
+        Location data Â© OpenStreetMap contributors
       </footer>
 
       {/* AI CHAT */}
