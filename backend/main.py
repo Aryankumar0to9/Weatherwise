@@ -1,6 +1,8 @@
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 import requests
+import time
+from threading import Lock
 
 app = FastAPI(title="WeatherWise API")
 
@@ -9,11 +11,129 @@ app.add_middleware(
     allow_origins=[
         "http://localhost:5173",
         "http://127.0.0.1:5173",
+        "http://localhost:5177",
+        "http://127.0.0.1:5177",
+        "https://weatherwise-green.vercel.app",
     ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+# ============================================================
+# EXTERNAL API RESILIENCE
+# - Cache successful responses for a few minutes.
+# - Retry temporary 429/5xx responses with backoff.
+# - Keep a short stale cache as a fallback if the provider is
+#   temporarily rate-limited.
+# ============================================================
+
+CACHE_TTL_SECONDS = 300          # 5 minutes
+STALE_CACHE_SECONDS = 1800       # 30 minutes
+MAX_RETRIES = 3
+
+_response_cache = {}
+_cache_lock = Lock()
+
+
+def _cache_key(url, params):
+    return (
+        url,
+        tuple(sorted((str(k), str(v)) for k, v in (params or {}).items())),
+    )
+
+
+def fetch_json(url, params=None, headers=None, timeout=15, cache_ttl=CACHE_TTL_SECONDS):
+    key = _cache_key(url, params)
+    now = time.monotonic()
+
+    # Fresh cache first.
+    with _cache_lock:
+        cached = _response_cache.get(key)
+        if cached and now - cached["time"] < cache_ttl:
+            return cached["data"]
+
+    last_error = None
+
+    for attempt in range(MAX_RETRIES):
+        try:
+            response = requests.get(
+                url,
+                params=params,
+                headers=headers,
+                timeout=timeout,
+            )
+
+            if response.status_code == 429:
+                last_error = requests.HTTPError(
+                    f"429 Too Many Requests for url: {response.url}"
+                )
+
+                # Respect Retry-After when supplied, but cap the wait.
+                retry_after = response.headers.get("Retry-After")
+                try:
+                    wait_seconds = min(float(retry_after), 10.0) if retry_after else 2.0 * (attempt + 1)
+                except ValueError:
+                    wait_seconds = 2.0 * (attempt + 1)
+
+                # If we have a recent stale result, prefer availability
+                # over failing the user's weather request.
+                with _cache_lock:
+                    cached = _response_cache.get(key)
+                    if cached and now - cached["time"] < STALE_CACHE_SECONDS:
+                        return cached["data"]
+
+                if attempt < MAX_RETRIES - 1:
+                    time.sleep(wait_seconds)
+                    continue
+
+                raise last_error
+
+            if 500 <= response.status_code < 600:
+                last_error = requests.HTTPError(
+                    f"{response.status_code} Server Error for url: {response.url}"
+                )
+                if attempt < MAX_RETRIES - 1:
+                    time.sleep(1.5 * (attempt + 1))
+                    continue
+                raise last_error
+
+            response.raise_for_status()
+            data = response.json()
+
+            with _cache_lock:
+                _response_cache[key] = {
+                    "time": time.monotonic(),
+                    "data": data,
+                }
+
+            return data
+
+        except requests.RequestException as exc:
+            last_error = exc
+            if attempt < MAX_RETRIES - 1:
+                time.sleep(1.5 * (attempt + 1))
+                continue
+
+    raise last_error or requests.RequestException("External API request failed")
+
+
+def external_api_error(service, exc):
+    message = str(exc)
+    if "429" in message or "Too Many Requests" in message:
+        return HTTPException(
+            status_code=503,
+            detail=(
+                f"{service} is temporarily rate-limited. "
+                "Please try again in a few seconds."
+            ),
+        )
+
+    return HTTPException(
+        status_code=502,
+        detail=f"{service} request failed: {message}",
+    )
 
 
 def calculate_outdoor_intelligence(
@@ -154,18 +274,13 @@ def get_weather(latitude: float, longitude: float):
     }
 
     try:
-        response = requests.get(
+        data = fetch_json(
             weather_url,
             params=params,
             timeout=15,
         )
-        response.raise_for_status()
-        data = response.json()
     except requests.RequestException as exc:
-        raise HTTPException(
-            status_code=502,
-            detail=f"Weather API request failed: {exc}",
-        )
+        raise external_api_error("Weather API", exc)
 
     current = data.get("current", {})
     hourly = data.get("hourly", {})
@@ -216,19 +331,14 @@ def get_location(latitude: float, longitude: float):
     }
 
     try:
-        response = requests.get(
+        data = fetch_json(
             location_url,
             params=params,
             headers=headers,
             timeout=15,
         )
-        response.raise_for_status()
-        data = response.json()
     except requests.RequestException as exc:
-        raise HTTPException(
-            status_code=502,
-            detail=f"Location API request failed: {exc}",
-        )
+        raise external_api_error("Location API", exc)
 
     address = data.get("address", {})
 
@@ -269,18 +379,13 @@ def get_air_quality(latitude: float, longitude: float):
     }
 
     try:
-        response = requests.get(
+        data = fetch_json(
             air_quality_url,
             params=params,
             timeout=15,
         )
-        response.raise_for_status()
-        data = response.json()
     except requests.RequestException as exc:
-        raise HTTPException(
-            status_code=502,
-            detail=f"Air quality API request failed: {exc}",
-        )
+        raise external_api_error("Air quality API", exc)
 
     current = data.get("current", {})
     aqi = current.get("us_aqi")
@@ -454,9 +559,14 @@ def get_alerts(latitude: float, longitude: float):
         "forecast_days": 2,
     }
 
-    response = requests.get(weather_url, params=weather_params, timeout=10)
-    response.raise_for_status()
-    weather_data = response.json()
+    try:
+        weather_data = fetch_json(
+            weather_url,
+            params=weather_params,
+            timeout=10,
+        )
+    except requests.RequestException as exc:
+        raise external_api_error("Alerts weather API", exc)
 
     air_quality_data = None
     try:
@@ -467,9 +577,11 @@ def get_alerts(latitude: float, longitude: float):
             "current": "us_aqi",
             "timezone": "auto",
         }
-        aq_response = requests.get(aq_url, params=aq_params, timeout=10)
-        if aq_response.ok:
-            air_quality_data = aq_response.json()
+        air_quality_data = fetch_json(
+            aq_url,
+            params=aq_params,
+            timeout=10,
+        )
     except requests.RequestException:
         pass
 
@@ -572,9 +684,14 @@ def analyze_event(
         "end_date": date,
     }
 
-    response = requests.get(weather_url, params=params, timeout=15)
-    response.raise_for_status()
-    data = response.json()
+    try:
+        data = fetch_json(
+            weather_url,
+            params=params,
+            timeout=15,
+        )
+    except requests.RequestException as exc:
+        raise external_api_error("Event forecast API", exc)
 
     hourly = data.get("hourly", {})
     times = hourly.get("time", [])
@@ -676,9 +793,14 @@ def geocode_city(city: str):
         "language": "en",
         "format": "json",
     }
-    response = requests.get(url, params=params, timeout=15)
-    response.raise_for_status()
-    data = response.json()
+    try:
+        data = fetch_json(
+            url,
+            params=params,
+            timeout=15,
+        )
+    except requests.RequestException as exc:
+        raise external_api_error("Geocoding API", exc)
     results = data.get("results", [])
 
     if not results:
@@ -813,311 +935,14 @@ def analyze_travel(
         ).strftime("%Y-%m-%d"),
     }
 
-    response = requests.get(weather_url, params=params, timeout=15)
-    response.raise_for_status()
-    data = response.json()
-    daily = data.get("daily", {})
-
-    dates = daily.get("time", [])
-    if not dates:
-        return {
-            "status": "Unavailable",
-            "risk_score": None,
-            "message": "No forecast is available for this destination and date.",
-            "daily": [],
-            "packing": [],
-            "advice": [],
-        }
-
-    temps_max = daily.get("temperature_2m_max", [])
-    temps_min = daily.get("temperature_2m_min", [])
-    rains = daily.get("precipitation_probability_max", [])
-    winds = daily.get("wind_speed_10m_max", [])
-    uvs = daily.get("uv_index_max", [])
-    codes = daily.get("weather_code", [])
-
-    valid = lambda arr: [x for x in arr if x is not None]
-
-    all_max = valid(temps_max)
-    all_min = valid(temps_min)
-    all_rain = valid(rains)
-    all_wind = valid(winds)
-    all_uv = valid(uvs)
-
-    avg_temperature = (
-        round((sum(all_max) + sum(all_min)) / (len(all_max) + len(all_min)), 1)
-        if all_max and all_min else None
-    )
-    max_rain = round(max(all_rain)) if all_rain else 0
-    max_wind = round(max(all_wind), 1) if all_wind else 0
-    max_uv = round(max(all_uv), 1) if all_uv else 0
-
-    score = 100
-
-    if max_rain >= 80:
-        score -= 35
-    elif max_rain >= 60:
-        score -= 25
-    elif max_rain >= 40:
-        score -= 15
-    elif max_rain >= 25:
-        score -= 7
-
-    if avg_temperature is not None:
-        if avg_temperature >= 40:
-            score -= 30
-        elif avg_temperature >= 36:
-            score -= 20
-        elif avg_temperature >= 33:
-            score -= 10
-        elif avg_temperature <= 8:
-            score -= 20
-
-    if max_wind >= 40:
-        score -= 25
-    elif max_wind >= 30:
-        score -= 15
-    elif max_wind >= 20:
-        score -= 7
-
-    if max_uv >= 9:
-        score -= 15
-    elif max_uv >= 7:
-        score -= 8
-
-    score = max(0, min(100, round(score)))
-
-    if score >= 75:
-        status = "Good"
-        message = "Forecast conditions look favorable for this trip."
-    elif score >= 50:
-        status = "Moderate"
-        message = "The trip is feasible, but some weather-related planning is recommended."
-    elif score >= 25:
-        status = "Risky"
-        message = "Weather may affect your plans. Keep alternatives available."
-    else:
-        status = "Poor"
-        message = "Weather conditions are unfavorable. Consider changing dates or plans."
-
-    daily_outlook = []
-    best_index = None
-    best_day_score = -1
-
-    for i, day in enumerate(dates):
-        day_rain = rains[i] if i < len(rains) and rains[i] is not None else 0
-        day_wind = winds[i] if i < len(winds) and winds[i] is not None else 0
-        day_max = temps_max[i] if i < len(temps_max) and temps_max[i] is not None else None
-        day_min = temps_min[i] if i < len(temps_min) and temps_min[i] is not None else None
-        day_uv = uvs[i] if i < len(uvs) and uvs[i] is not None else 0
-        day_score = 100 - min(45, day_rain * 0.45) - min(25, max(0, day_wind - 15) * 1.0)
-
-        if day_max is not None and day_max >= 36:
-            day_score -= 15
-        if day_uv >= 8:
-            day_score -= 8
-
-        day_score = max(0, day_score)
-
-        if day_score > best_day_score:
-            best_day_score = day_score
-            best_index = i
-
-        daily_outlook.append({
-            "date": day,
-            "max_temperature": round(day_max, 1) if day_max is not None else "—",
-            "min_temperature": round(day_min, 1) if day_min is not None else "—",
-            "rain_probability": round(day_rain),
-            "wind_speed": round(day_wind, 1),
-            "uv_index": round(day_uv, 1),
-            "weather": travel_weather_label(codes[i] if i < len(codes) else None),
-        })
-
-    packing, advice = build_travel_advice(
-        trip_type,
-        avg_temperature or 25,
-        max_rain,
-        max_wind,
-        max_uv,
-    )
-
-    best_day = None
-    if best_index is not None:
-        best_day = {
-            "date": dates[best_index],
-            "reason": "This day has the most favorable combination of rain, wind, temperature, and UV conditions in your trip window.",
-        }
-
-    return {
-        "date": date,
-        "days": days,
-        "trip_type": trip_type,
-        "risk_score": score,
-        "status": status,
-        "message": message,
-        "summary": {
-            "avg_temperature": avg_temperature,
-            "max_rain_probability": max_rain,
-            "max_wind_speed": max_wind,
-            "max_uv_index": max_uv,
-        },
-        "daily": daily_outlook,
-        "packing": packing,
-        "advice": advice,
-        "best_day": best_day,
-    }
-
-# ---------------- TRAVEL PLANNER ----------------
-
-@app.get("/api/geocode")
-def geocode_city(city: str):
-    url = "https://geocoding-api.open-meteo.com/v1/search"
-    params = {
-        "name": city,
-        "count": 1,
-        "language": "en",
-        "format": "json",
-    }
-    response = requests.get(url, params=params, timeout=15)
-    response.raise_for_status()
-    data = response.json()
-    results = data.get("results", [])
-
-    if not results:
-        raise HTTPException(status_code=404, detail="Destination not found")
-
-    place = results[0]
-    return {
-        "name": place.get("name"),
-        "country": place.get("country"),
-        "latitude": place["latitude"],
-        "longitude": place["longitude"],
-    }
-
-
-def travel_weather_label(code):
     try:
-        code = int(code)
-    except (TypeError, ValueError):
-        return "Variable weather"
-
-    if code == 0:
-        return "Clear sky"
-    if code in (1, 2, 3):
-        return "Partly cloudy"
-    if code in (45, 48):
-        return "Foggy"
-    if code in (51, 53, 55, 56, 57):
-        return "Drizzle"
-    if code in (61, 63, 65, 66, 67):
-        return "Rain"
-    if code in (71, 73, 75, 77):
-        return "Snow"
-    if code in (80, 81, 82):
-        return "Rain showers"
-    if code in (85, 86):
-        return "Snow showers"
-    if code in (95, 96, 99):
-        return "Thunderstorm"
-    return "Variable weather"
-
-
-def build_travel_advice(
-    trip_type,
-    avg_temperature,
-    max_rain_probability,
-    max_wind_speed,
-    max_uv_index,
-):
-    packing = []
-    advice = []
-
-    if max_rain_probability >= 40:
-        packing.append("Umbrella or compact rain jacket")
-        packing.append("Water-resistant footwear")
-        advice.append("Keep outdoor activities flexible because rain is possible.")
-
-    if avg_temperature >= 32:
-        packing.append("Light, breathable clothing")
-        packing.append("Sunglasses and sunscreen")
-        advice.append("Plan strenuous sightseeing for cooler morning or evening hours.")
-    elif avg_temperature <= 15:
-        packing.append("Warm layers")
-        advice.append("Carry an extra layer for early mornings and evenings.")
-    else:
-        packing.append("Comfortable daywear with one light layer")
-
-    if max_uv_index >= 7:
-        packing.append("Sunscreen and a hat")
-        advice.append("Use shade and sun protection during peak UV hours.")
-
-    if max_wind_speed >= 30:
-        advice.append("Check local conditions before exposed outdoor or water activities.")
-
-    if trip_type == "Beach":
-        packing.append("Swimwear and a beach cover-up")
-        if max_wind_speed >= 25:
-            advice.append("Check local beach and water conditions before entering the water.")
-
-    elif trip_type == "Adventure":
-        packing.append("Comfortable walking shoes")
-        advice.append("Avoid exposed activities if thunderstorms or strong winds develop.")
-
-    elif trip_type == "Road Trip":
-        packing.append("Light travel essentials and water")
-        advice.append("Check visibility and rain conditions before long drives.")
-
-    elif trip_type == "Family":
-        packing.append("Basic essentials for children")
-        advice.append("Keep an indoor backup activity if rain risk increases.")
-
-    elif trip_type == "Business":
-        packing.append("One weather-appropriate formal layer")
-        advice.append("Allow extra travel time if rain or poor visibility is forecast.")
-
-    if not packing:
-        packing.append("Weather-appropriate clothing")
-
-    if not advice:
-        advice.append("Forecast conditions look broadly manageable for this trip.")
-
-    return packing, advice
-
-
-@app.get("/api/travel-analysis")
-def analyze_travel(
-    latitude: float,
-    longitude: float,
-    date: str,
-    days: int = 2,
-    trip_type: str = "Sightseeing",
-):
-    days = max(1, min(int(days), 7))
-
-    weather_url = "https://api.open-meteo.com/v1/forecast"
-    params = {
-        "latitude": latitude,
-        "longitude": longitude,
-        "daily": ",".join([
-            "temperature_2m_max",
-            "temperature_2m_min",
-            "precipitation_probability_max",
-            "weather_code",
-            "wind_speed_10m_max",
-            "uv_index_max",
-            "sunrise",
-            "sunset",
-        ]),
-        "timezone": "auto",
-        "start_date": date,
-        "end_date": (
-            datetime.strptime(date, "%Y-%m-%d") + timedelta(days=days - 1)
-        ).strftime("%Y-%m-%d"),
-    }
-
-    response = requests.get(weather_url, params=params, timeout=15)
-    response.raise_for_status()
-    data = response.json()
+        data = fetch_json(
+            weather_url,
+            params=params,
+            timeout=15,
+        )
+    except requests.RequestException as exc:
+        raise external_api_error("Travel forecast API", exc)
     daily = data.get("daily", {})
 
     dates = daily.get("time", [])
