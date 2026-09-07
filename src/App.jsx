@@ -3495,7 +3495,10 @@ const saveProfile = (profileId) => {
             const locationResponse = await fetch(`${API_BASE}/api/location?latitude=${latitude}&longitude=${longitude}`);
             if (locationResponse.ok) {
               const locationData = await locationResponse.json();
-              const placeName = [locationData?.city, locationData?.state].filter(Boolean).join(", ") || locationData?.country;
+              const placeName = [
+                locationData?.place_name || locationData?.city,
+                locationData?.state,
+              ].filter(Boolean).join(", ") || locationData?.country;
               if (placeName) {
                 setWeather((previous) => ({ ...previous, city: placeName }));
                 setLocationName(placeName);
@@ -3962,7 +3965,7 @@ const saveProfile = (profileId) => {
 
                 <div className="temperature">
 
-                  {weather.temperature}
+                  {weather.temperature === "--" ? "Loading…" : weather.temperature}
 
                   {weather.temperature !== "--" &&
                     "°"}

@@ -293,17 +293,35 @@ def get_weather(latitude: float, longitude: float):
     except requests.RequestException as exc:
         raise external_api_error("Weather API", exc)
 
-    current = data.get("current", {})
-    hourly = data.get("hourly", {})
+    current = data.get("current", {}) or {}
+    hourly = data.get("hourly", {}) or {}
 
-    temperature = current.get("temperature_2m", 0)
+    # Open-Meteo normally returns all requested current values. If a provider
+    # response ever omits one, use the first hourly value instead of showing
+    # a blank temperature/metric in the UI.
+    temperature = current.get("temperature_2m")
+    if temperature is None:
+        temperature = (hourly.get("temperature_2m") or [None])[0]
+
     rain_probability = (
-        hourly.get("precipitation_probability", [0])[0]
-        if hourly.get("precipitation_probability")
-        else 0
+        (hourly.get("precipitation_probability") or [0])[0]
     )
-    wind_speed = current.get("wind_speed_10m", 0)
-    uv_index = current.get("uv_index", 0)
+
+    wind_speed = current.get("wind_speed_10m")
+    if wind_speed is None:
+        wind_speed = (hourly.get("wind_speed_10m") or [0])[0]
+
+    uv_index = current.get("uv_index")
+    if uv_index is None:
+        uv_index = (hourly.get("uv_index") or [0])[0]
+
+    # Keep the frontend's current-temperature field populated when possible.
+    if current.get("temperature_2m") is None and temperature is not None:
+        current["temperature_2m"] = temperature
+    if current.get("wind_speed_10m") is None and wind_speed is not None:
+        current["wind_speed_10m"] = wind_speed
+    if current.get("uv_index") is None and uv_index is not None:
+        current["uv_index"] = uv_index
 
     outdoor = calculate_outdoor_intelligence(
         temperature,
@@ -334,12 +352,13 @@ def get_location(latitude: float, longitude: float):
         "lat": latitude,
         "lon": longitude,
         "format": "jsonv2",
-        "zoom": 10,
+        "zoom": 12,
         "addressdetails": 1,
+        "accept-language": "en",
     }
 
     headers = {
-        "User-Agent": "WeatherWise/1.0",
+        "User-Agent": "WeatherWise/1.0 (https://weatherwise-green.vercel.app)",
     }
 
     try:
@@ -348,22 +367,39 @@ def get_location(latitude: float, longitude: float):
             params=params,
             headers=headers,
             timeout=15,
+            cache_ttl=1800,
         )
     except requests.RequestException as exc:
         raise external_api_error("Location API", exc)
 
-    address = data.get("address", {})
+    address = data.get("address", {}) or {}
+
+    # OSM/Nominatim does not guarantee that every location has a `city` field.
+    # Depending on the coordinate, the useful settlement may be returned as
+    # town, village, municipality, suburb, district, etc.
+    city = (
+        address.get("city")
+        or address.get("town")
+        or address.get("municipality")
+        or address.get("village")
+        or address.get("suburb")
+        or address.get("district")
+        or address.get("county")
+        or address.get("state_district")
+    )
+
+    # Last-resort name from the first meaningful part of display_name.
+    display_name = data.get("display_name") or ""
+    place_name = city
+    if not place_name and display_name:
+        place_name = display_name.split(",")[0].strip()
 
     return {
-        "city": (
-            address.get("city")
-            or address.get("town")
-            or address.get("village")
-            or address.get("municipality")
-        ),
+        "city": city,
+        "place_name": place_name,
         "state": address.get("state"),
         "country": address.get("country"),
-        "display_name": data.get("display_name"),
+        "display_name": display_name,
         "latitude": latitude,
         "longitude": longitude,
     }
