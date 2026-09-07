@@ -738,7 +738,7 @@ function SavedPlaces({ places, onSelect, onRemove, onClose }) {
                   <div className="saved-place-icon"><MapPin size={19} /></div>
                   <div>
                     <strong>{place.city}</strong>
-                    <span>{place.temperature}° â€¢ {place.outdoor} outdoor</span>
+                    <span>{place.temperature}° • {place.outdoor} outdoor</span>
                   </div>
                 </button>
                 <button
@@ -1019,7 +1019,7 @@ function FamilyDashboard({
               />
 
               <ProfileMetric
-                icon="🌧️ï¸"
+                icon="🌧️"
                 label="Rain Chance"
                 value={
                   rain === "--"
@@ -1114,11 +1114,11 @@ function FamilyDashboard({
           <div className="time-weather-grid">
 
             {[
-              ["7 AM", "â˜ï¸", "24°C"],
+              ["7 AM", "☁️", "24°C"],
               ["9 AM", "🌤️", "26°C"],
               ["12 PM", "☀️", "28°C"],
-              ["3 PM", "â˜ï¸", "27°C"],
-              ["6 PM", "🌧️ï¸", "25°C"],
+              ["3 PM", "☁️", "27°C"],
+              ["6 PM", "🌧️", "25°C"],
             ].map(([time, icon, temp]) => (
               <div
                 className="time-weather-card"
@@ -1348,7 +1348,7 @@ function ProfileSpecificContent({
           description: "Current conditions",
         },
         {
-          icon: "🌧️ï¸",
+          icon: "🌧️",
           label: "Rain Chance",
           value:
             rain !== null
@@ -1442,7 +1442,7 @@ function ProfileSpecificContent({
           description: "Comfort for travel",
         },
         {
-          icon: "🌧️ï¸",
+          icon: "🌧️",
           label: "Rain Chance",
           value:
             rain !== null
@@ -1524,7 +1524,7 @@ function ProfileSpecificContent({
 
       metrics: [
         {
-          icon: "🌧️ï¸",
+          icon: "🌧️",
           label: "Rain Risk",
           value:
             rain !== null
@@ -1633,7 +1633,7 @@ function ProfileSpecificContent({
           description: "Field humidity",
         },
         {
-          icon: "🌧️ï¸",
+          icon: "🌧️",
           label: "Rain Chance",
           value:
             rain !== null
@@ -1818,7 +1818,7 @@ function ProfileSpecificContent({
           description: "Guest comfort",
         },
         {
-          icon: "🌧️ï¸",
+          icon: "🌧️",
           label: "Rain Risk",
           value:
             rain !== null
@@ -1927,7 +1927,7 @@ function ProfileSpecificContent({
           description: "Garden humidity",
         },
         {
-          icon: "🌧️ï¸",
+          icon: "🌧️",
           label: "Rain Chance",
           value:
             rain !== null
@@ -2231,11 +2231,11 @@ function ProfileExtraSections({
               <div className="time-weather-grid">
 
                 {[
-                  ["7 AM", "â˜ï¸", "Morning"],
+                  ["7 AM", "☁️", "Morning"],
                   ["9 AM", "🌤️", "School"],
                   ["12 PM", "☀️", "Midday"],
-                  ["3 PM", "â˜ï¸", "Afternoon"],
-                  ["6 PM", "🌧️ï¸", "Evening"],
+                  ["3 PM", "☁️", "Afternoon"],
+                  ["6 PM", "🌧️", "Evening"],
                 ].map(
                   ([time, icon, label]) => (
                     <div
@@ -2361,7 +2361,7 @@ function ProfileExtraSections({
                   />
 
                   <ProfileMetric
-                    icon="🌧️ï¸"
+                    icon="🌧️"
                     label="Rain"
                     value={
                       weather?.rain !== undefined
@@ -2425,7 +2425,7 @@ function ProfileExtraSections({
             <div className="profile-main-card">
 
               <h3>
-                ðŸ“… Destination Forecast
+                📅 Destination Forecast
               </h3>
 
               <p>
@@ -2491,9 +2491,9 @@ function ProfileExtraSections({
                 <div className="time-weather-grid">
 
                   {[
-                    ["7â€“9 AM", "Good"],
-                    ["12â€“2 PM", "Good"],
-                    ["5â€“7 PM", "Check"],
+                    ["7–9 AM", "Good"],
+                    ["12–2 PM", "Good"],
+                    ["5–7 PM", "Check"],
                   ].map(
                     ([time, status]) => (
                       <div
@@ -2601,7 +2601,7 @@ function ProfileExtraSections({
                   />
 
                   <ProfileMetric
-                    icon="🌧️ï¸"
+                    icon="🌧️"
                     label="Rain"
                     value={
                       weather?.rain !== undefined
@@ -2667,7 +2667,7 @@ function ProfileExtraSections({
             <div className="profile-main-card">
 
               <h3>
-                🌧️ï¸ Rainfall & Irrigation
+                🌧️ Rainfall & Irrigation
               </h3>
 
               <p>
@@ -2737,21 +2737,21 @@ function ProfileExtraSections({
                 <div className="time-weather-grid">
 
                   <div className="time-weather-card">
-                    <strong>5â€“8 AM</strong>
+                    <strong>5–8 AM</strong>
                     <span>🌅</span>
                     <b>Best</b>
                     <small>Cooler hours</small>
                   </div>
 
                   <div className="time-weather-card">
-                    <strong>5â€“7 PM</strong>
-                    <span>ðŸŒ‡</span>
+                    <strong>5–7 PM</strong>
+                    <span>🌇</span>
                     <b>Good</b>
                     <small>Evening window</small>
                   </div>
 
                   <div className="time-weather-card">
-                    <strong>12â€“2 PM</strong>
+                    <strong>12–2 PM</strong>
                     <span>☀️</span>
                     <b>Avoid</b>
                     <small>Peak sun</small>
@@ -2841,7 +2841,7 @@ function ProfileExtraSections({
                   />
 
                   <ProfileMetric
-                    icon="🌧️ï¸"
+                    icon="🌧️"
                     label="Rain Risk"
                     value={
                       weather?.rain !== undefined
@@ -2930,7 +2930,7 @@ function ProfileExtraSections({
 
                 <div className="time-weather-card">
                   <strong>Evening</strong>
-                  <span>ðŸŒ‡</span>
+                  <span>🌇</span>
                   <b>Good</b>
                   <small>Check rain risk</small>
                 </div>
@@ -2988,7 +2988,7 @@ function ProfileExtraSections({
                   />
 
                   <ProfileMetric
-                    icon="🌧️ï¸"
+                    icon="🌧️"
                     label="Rain"
                     value={
                       weather?.rain !== undefined
@@ -3062,7 +3062,7 @@ function ProfileExtraSections({
               <div className="activity-grid">
 
                 <div className="activity-card">
-                  <span>🌧️ï¸</span>
+                  <span>🌧️</span>
                   <strong>Heavy Rain</strong>
                   <b>
                     {weather?.rain >= 60
@@ -3244,7 +3244,7 @@ function App() {
 
   const [showNotifications, setShowNotifications] = useState(false);
   const [showChat, setShowChat] = useState(false);
-  const [chatMessages, setChatMessages] = useState([{ role: "assistant", text: "Hi! Iâ€™m WeatherWise. Ask me about todayâ€™s weather, outdoor plans, travel, health or your selected profile." }]);
+  const [chatMessages, setChatMessages] = useState([{ role: "assistant", text: "Hi! I’m WeatherWise. Ask me about today’s weather, outdoor plans, travel, health or your selected profile." }]);
   const [chatInput, setChatInput] = useState("");
 
   useEffect(() => {
@@ -3282,11 +3282,11 @@ function App() {
 
   const getAlertIcon = (type) => {
     if (type === "heat") return "🌡️";
-    if (type === "rain") return "🌧️ï¸";
+    if (type === "rain") return "🌧️";
     if (type === "wind") return "💨";
-    if (type === "storm") return "â›ˆï¸";
+    if (type === "storm") return "⛈️";
     if (type === "uv") return "☀️";
-    if (type === "air") return "ðŸ˜·";
+    if (type === "air") return "🤧";
     return "⚠️";
   };
 
@@ -3397,7 +3397,6 @@ const saveProfile = (profileId) => {
     setCoordinates(null);
     setBackendResponse(null);
     setAirQuality(null);
-    setAlerts([]);
     setSelectedPlan(null);
     setLocationName("");
     setShowSavedPlaces(false);
@@ -3548,10 +3547,10 @@ const saveProfile = (profileId) => {
 
     const minDate = new Date(today);
     const maxStartDate = new Date(today);
-    // WeatherWise guarantees a fallback forecast window of up to 9 days.
-    // Keep the selected trip inside that window (trip length can be up to 7 days).
+    // Open-Meteo's forecast window is up to 16 days. Keep the whole
+    // selected trip inside that window (trip length can be up to 7 days).
     maxStartDate.setDate(
-      maxStartDate.getDate() + (9 - Number(travelForm.days || 2))
+      maxStartDate.getDate() + (16 - Number(travelForm.days || 2))
     );
 
     return {
@@ -3630,62 +3629,24 @@ const saveProfile = (profileId) => {
   };
 
   const analyzeEvent = async (event) => {
-    if (!event.date || !event.time) return;
+    if (!coordinates || !event.date || !event.time) return;
 
     try {
-      let latitude = coordinates?.latitude;
-      let longitude = coordinates?.longitude;
-
-      // If the user entered an event location, analyze that location.
-      // Otherwise use the current detected location.
-      if (event.location.trim()) {
-        const geoResponse = await fetch(
-          `${API_BASE}/api/geocode?city=${encodeURIComponent(event.location.trim())}`
-        );
-
-        if (!geoResponse.ok) {
-          let detail = "Event location not found";
-          try {
-            const errorData = await geoResponse.json();
-            detail = errorData.detail || detail;
-          } catch {}
-          throw new Error(detail);
-        }
-
-        const geo = await geoResponse.json();
-        latitude = geo.latitude;
-        longitude = geo.longitude;
-      }
-
-      if (latitude == null || longitude == null) {
-        throw new Error("Enter an event location or use your current location first.");
-      }
-
       const response = await fetch(
-        `${API_BASE}/api/event-analysis?latitude=${latitude}&longitude=${longitude}&date=${encodeURIComponent(event.date)}&time=${encodeURIComponent(event.time)}&duration=${encodeURIComponent(event.duration)}&setting=${encodeURIComponent(event.setting)}`
+        `${API_BASE}/api/event-analysis?latitude=${coordinates.latitude}&longitude=${coordinates.longitude}&date=${encodeURIComponent(event.date)}&time=${encodeURIComponent(event.time)}&duration=${encodeURIComponent(event.duration)}`
       );
 
-      if (!response.ok) {
-        let detail = "Event analysis unavailable";
-        try {
-          const errorData = await response.json();
-          detail = errorData.detail || detail;
-        } catch {}
-        throw new Error(detail);
-      }
+      if (!response.ok) throw new Error("Event analysis unavailable");
 
       const data = await response.json();
-      setEventResult({
-        ...data,
-        location: event.location || "Current location",
-      });
+      setEventResult(data);
       setShowEventPlanner(true);
     } catch (error) {
-      console.error("Event analysis failed:", error);
+      console.error(error);
       setEventResult({
         status: "Unavailable",
         risk_score: null,
-        message: error.message || "Unable to analyze this event right now.",
+        message: "Unable to analyze this event right now. Please check that the WeatherWise backend is running.",
         recommendations: [],
       });
       setShowEventPlanner(true);
@@ -3696,26 +3657,6 @@ const saveProfile = (profileId) => {
     e.preventDefault();
     analyzeEvent(eventForm);
   };
-
-
-  const getEventDateLimits = () => {
-    const today = new Date();
-    const toDateInput = (date) => {
-      const year = date.getFullYear();
-      const month = String(date.getMonth() + 1).padStart(2, "0");
-      const day = String(date.getDate()).padStart(2, "0");
-      return `${year}-${month}-${day}`;
-    };
-
-    const maxDate = new Date(today);
-    maxDate.setDate(maxDate.getDate() + 8);
-
-    return {
-      min: toDateInput(today),
-      max: toDateInput(maxDate),
-    };
-  };
-
 
 
   const answerWeatherQuestion = (question) => {
@@ -3762,7 +3703,7 @@ const saveProfile = (profileId) => {
         : `Travel conditions currently look manageable: ${Math.round(temp)}°C, ${Math.round(rain)}% rain probability and ${Math.round(wind)} km/h wind.`;
     }
 
-    return `Right now it is ${Math.round(temp)}°C with ${Math.round(rain)}% rain probability, ${Math.round(wind)} km/h wind and UV ${uv != null ? Math.round(uv) : "--"}. Tell me what youâ€™re planning and Iâ€™ll turn that into a practical recommendation.`;
+    return `Right now it is ${Math.round(temp)}°C with ${Math.round(rain)}% rain probability, ${Math.round(wind)} km/h wind and UV ${uv != null ? Math.round(uv) : "--"}. Tell me what you’re planning and I’ll turn that into a practical recommendation.`;
   };
 
   const handleChatSubmit = (event) => {
@@ -3968,8 +3909,8 @@ const saveProfile = (profileId) => {
                 <MapPin size={15} />
 
                 {locationName
-                  ? `${locationName} â€¢ `
-                  : "Location detected â€¢ "}
+                  ? `${locationName} • `
+                  : "Location detected • "}
 
                 {coordinates.latitude.toFixed(4)},{" "}
                 {coordinates.longitude.toFixed(4)}
@@ -4423,7 +4364,7 @@ const saveProfile = (profileId) => {
                     required
                   />
                   <small className="travel-date-note">
-                    Live forecast is available for the next 9 days.
+                    Live forecast available for the next 16 days.
                   </small>
                 </label>
 
@@ -4607,14 +4548,9 @@ const saveProfile = (profileId) => {
                   <input
                     type="date"
                     value={eventForm.date}
-                    min={getEventDateLimits().min}
-                    max={getEventDateLimits().max}
                     onChange={(e) => setEventForm({ ...eventForm, date: e.target.value })}
                     required
                   />
-                  <small className="travel-date-note">
-                    Live event forecast available for the next 9 days.
-                  </small>
                 </label>
 
                 <label>
@@ -4654,9 +4590,6 @@ const saveProfile = (profileId) => {
                   <div>
                     <span className="eyebrow">FORECAST ANALYSIS</span>
                     <h3>{eventForm.name || "Your event"}</h3>
-                    {eventResult.location && (
-                      <p className="event-result-location">{eventResult.location}</p>
-                    )}
                   </div>
                   <div className={`event-risk-badge ${String(eventResult.status || "").toLowerCase().replace(/\s+/g, "-")}`}>
                     {eventResult.status}
@@ -4875,7 +4808,7 @@ const saveProfile = (profileId) => {
       {/* OPENSTREETMAP ATTRIBUTION */}
 
       <footer className="footer">
-        Location data Â© OpenStreetMap contributors
+        Location data © OpenStreetMap contributors
       </footer>
 
       {/* AI CHAT */}
